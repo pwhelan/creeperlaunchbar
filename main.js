@@ -5,7 +5,7 @@ var ipc = require('ipc');
 var fs = require('fs');
 var plist = require('plist');
 var spawn = require('child_process').spawn;
-var exploreDirectory = require('./exploreDirectory').exploreDirectory;
+var exploreDirectory = require('./lib/exploreDirectory').exploreDirectory;
 var path = require('path');
 var crypto = require('crypto');
 

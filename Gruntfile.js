@@ -10,7 +10,8 @@ module.exports = function(grunt) {
 				files: [
 					'main.js',
 					'index.html',
-					'lib/browser.js',
+					'lib/*.js',
+					'lib/**/*.js'
 				],
 				tasks: ['atom-shell:restart']
 			}
