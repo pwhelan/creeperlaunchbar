@@ -12,17 +12,19 @@
     height: 70px;
     font-size: 42px;
   }
+  body {
+    background-color: black;
+  }
   </style>
   <body>
     <div class="col-md-12" style="padding: 5px;">
-      <div class="input-group input-group-lg" style="margin-bottom: 10px">
+      <div class="input-group input-group-lg">
         <input type="text" class="form-control" id="query">
         <span class="input-group-addon">
          <img src="media/img/Minecraft_Creeper_2-48x48.png"/>
         </span>
       </div>
-      <ul class="list-group" id="results">
-      </ul>
+      <ul class="list-group" id="results" style="padding: 0; margin: 0;"></ul>
     </div>
   </body>
   <script src="lib/browser.js"></script>
