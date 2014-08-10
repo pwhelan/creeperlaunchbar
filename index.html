@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WTF</title>
+    <link href="node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="tex/css"/>
+    <link href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="tex/css"/>
+  </head>
+  <style>
+  body { background-color: transparent; }
+  ul.list-group { max-height: 580px; overflow: scroll}
+  #query {
+    height: 86px;
+    font-size: 64px;
+  }
+  </style>
+  <body>
+    <div class="col-md-12" style="padding: 5px;">
+      <div class="input-group input-group-lg" style="margin-bottom: 10px">
+        <input type="text" class="form-control" id="query">
+        <span class="input-group-addon">
+         <img src="media/img/Minecraft_Creeper_2-64x64.png"/>
+        </span>
+      </div>
+      <ul class="list-group" id="results">
+      </ul>
+    </div>
+  </body>
+  <script src="lib/browser.js"></script>
+</html>
