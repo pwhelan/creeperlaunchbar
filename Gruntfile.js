@@ -66,21 +66,23 @@ module.exports = function(grunt) {
 		}
 		
 		var fs = require('fs');
-		
-		var oldpid = fs.readFileSync('./console/atom-shell.pid');
-		if (oldpid) {
-			try {
-				process.kill(parseInt(oldpid), 'SIGTERM');
-				console.log('Shut down Atom Shell running with pid ' + parseInt(oldpid));
-			}
-			catch(err) {
-				console.log('Atom Shell is not running');
-				return;
-			}
-			finally {
-				fs.unlinkSync('./console/atom-shell.pid');
+		try {
+			var oldpid = fs.readFileSync('./console/atom-shell.pid');
+			if (oldpid) {
+				try {
+					process.kill(parseInt(oldpid), 'SIGTERM');
+					console.log('Shut down Atom Shell running with pid ' + parseInt(oldpid));
+				}
+				catch(err) {
+					console.log('Atom Shell is not running');
+					return;
+				}
+				finally {
+					fs.unlinkSync('./console/atom-shell.pid');
+				}
 			}
 		}
+		catch (err) {}
 	});
 	
 	grunt.registerTask('atom-shell:restart', ['atom-shell:stop', 'atom-shell:start'])
