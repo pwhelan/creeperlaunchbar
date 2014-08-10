@@ -86,5 +86,5 @@ module.exports = function(grunt) {
 		catch (err) {}
 	});
 	
-	grunt.registerTask('atom-shell:restart', ['atom-shell:stop', 'atom-shell:start'])
+	grunt.registerTask('atom-shell:restart', ['atom-shell:stop', 'atom-shell:start']);
 };
