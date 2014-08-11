@@ -77,9 +77,6 @@ ipc
 		
 		var results = Database.search(query);
 		mainWindow.webContents.send('results', results);
-	})
-	.on('exec:application', function(event, appPath) {
-		spawn('open', [appPath], {detached: true});
 	});
 
 
