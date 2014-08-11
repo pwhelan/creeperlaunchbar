@@ -1,11 +1,18 @@
-var app = require('app');  // Module to control application life.
-var BrowserWindow = require('browser-window');  // Module to create native browser window.
-var globalShortcut = require('global-shortcut');
-var ipc = require('ipc');
-var fs = require('fs');
-var plist = require('plist');
-var spawn = require('child_process').spawn;
-var path = require('path');
+var app = require('app'),
+	// IPC between Main envinronment and Chromium
+	ipc = require('ipc'),
+	// File System Access
+	fs = require('fs'),
+	// Path Manipulation
+	path = require('path'),
+	// Process Spawning
+	spawn = require('child_process').spawn,
+	// Module to create native browser window.
+	BrowserWindow = require('browser-window'),
+	// Module to Activate the Global Shortcut
+	GlobalShortcut = require('global-shortcut');
+
+
 var Database = {};
 
 for (var i = 0; i <= 9; i++) {
@@ -101,7 +108,7 @@ app.on('ready', function() {
 			mainWindow = null;
 		});
 	
-	var ret = globalShortcut.register('ctrl+space', function() {
+	var ret = GlobalShortcut.register('ctrl+space', function() {
 		
 		mainWindow.show();
 		mainWindow.focus();
@@ -148,9 +155,6 @@ ipc
 		}
 		
 		mainWindow.webContents.send('results', results);
-	})
-	.on('exec:numbers', function(event, number) {
-		console.log('NUMBER = ' + number);
 	})
 	.on('exec:application', function(event, appPath) {
 		spawn('open', [appPath], {detached: true});
