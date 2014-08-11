@@ -5,17 +5,65 @@ var ipc = require('ipc');
 var fs = require('fs');
 var plist = require('plist');
 var spawn = require('child_process').spawn;
-var exploreDirectory = require('./lib/exploreDirectory').exploreDirectory;
 var path = require('path');
-var crypto = require('crypto');
+var Database = {};
 
-
-function checksum (str, algorithm, encoding) {
-	return crypto
-		.createHash(algorithm || 'md5')
-		.update(str, 'utf8')
-		.digest(encoding || 'hex');
+for (var i = 0; i <= 9; i++) {
+	Database[i] = [];
 }
+
+for (var i = 'A'.charCodeAt(0); i <= 'Z'.charCodeAt(0); i++) {
+	Database[String.fromCharCode(i)] = [];
+}
+
+Array.prototype.getUniqueByKey = function(key) {
+	var u = {}, a = [];
+	for(var i = 0, l = this.length; i < l; ++i){
+		if(u.hasOwnProperty(this[i][key])) {
+			continue;
+		}
+		a.push(this[i]);
+		u[this[i][key]] = 1;
+	}
+	return a;
+};
+
+
+require('./lib/searchers/osx/ApplicationBundles').initialize(function(entry) {
+	var part;
+	var camelcaseparts = entry.label.split(/(SQL|JSON|[A-Z]+[a-z]+)|\s|\_/);
+	
+	
+	entry.term = entry.label;
+	Database[entry.label[0].toUpperCase()].push(entry);
+	
+	
+	do {
+		part = camelcaseparts.shift();
+		
+		if (part) part = part.trim();
+		if (!part || part.length <= 0) {
+			continue;
+		}
+		
+		if (Database[part[0].toUpperCase()]) {
+			Database[part[0].toUpperCase()].push({
+				label: entry.label,
+				icon: entry.icon,
+				term: part,
+				command: {
+					channel: entry.command.channel,
+					args: entry.command.args
+				}
+			});
+		}
+		
+	} while (camelcaseparts.length > 0);
+	
+	for (var key in Database) {
+		Database[key] = Database[key].getUniqueByKey('label');
+	}
+});
 
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -63,107 +111,6 @@ app.on('ready', function() {
 });
 
 
-var Applications = {};
-
-for (var i = 'A'.charCodeAt(0); i <= 'Z'.charCodeAt(0); i++) {
-	Applications[String.fromCharCode(i)] = [];
-}
-
-
-var ParseApplicationBundle = function(fpath) {
-	var info;
-	
-	try {
-		info = plist.parse(
-			fs.readFileSync(fpath + '/Contents/Info.plist', 'utf8')
-		);
-	}
-	catch (err) {
-		var shortname = path.basename(fpath);
-		shortname = shortname.substr(0, shortname.lastIndexOf('.'));
-		
-		console.error(err);
-		info = {
-			CFBundleName: shortname,
-			CFBundleIconFile: shortname
-		};
-	}
-	
-	//console.log(JSON.stringify(obj));
-	console.log('ICON = ' + info.CFBundleIconFile);
-	console.log('APP NAME = ' + info.CFBundleName);
-	var appName = info.CFBundleName? info.CFBundleName : info.CFBundleExecutable;
-	var pngIconFile = '/Users/pwhelan/.launchdd/cache/app-icons/' +
-				checksum(fpath + '/' + appName) + '.png';
-	
-	
-	fs.exists(pngIconFile, function(exists) {
-		
-		if (!exists) {
-			var candidates = [
-				fpath + '/Contents/Resources/' + info.CFBundleIconFile,
-				fpath + '/Contents/Resources/' + info.CFBundleIconFile + '.icns',
-				fpath + '/Contents/Resources/' + appName + '.icns'
-			];
-			
-			
-			for (var icon = 0; icon < candidates.length; icon++)
-			{
-				icnsIconFile = candidates[icon];
-				if (fs.existsSync(icnsIconFile)) {
-					var sips = spawn('sips', [
-						'-s',
-						'format', 'png',
-						icnsIconFile,
-						'--out', pngIconFile
-					]);
-					
-					
-					sips.stdout.on('data', function (data) {
-						console.log('SIPS: stdout: ' + data);
-					});
-					
-					sips.stderr.on('data', function (data) {
-						console.log('SIPS: stderr: ' + data);
-					});
-					
-					sips.on('close', function (code) {
-						console.log('SIPS: child process exited with code ' + code);
-					});
-				}
-			}
-			
-		}
-		
-		Applications[appName[0].toUpperCase()].push({
-			label	: appName,
-			icon	: 'file://' + pngIconFile,
-			command	: {
-				channel : 'exec:application',
-				args	: [ fpath ]
-			}
-		});
-	});
-
-};
-
-
-var ParseApplicationsDirectory = function(path) {
-	
-	if (path.substr(path.lastIndexOf('.')) == '.app') {
-		console.log('BUNDLE = ' + process.cwd() + '/' + path);
-		ParseApplicationBundle(path);
-		
-		return false;
-	}
-	
-	return true;
-};
-
-exploreDirectory('/Applications/', ParseApplicationsDirectory);
-exploreDirectory('/Users/pwhelan/Applications/', ParseApplicationsDirectory);
-
-
 ipc
 	.on('resize', function(event, size) {
 		var osize = mainWindow.getSize();
@@ -182,14 +129,18 @@ ipc
 		
 		var results = [];
 		if (query.length > 0) {
-			var space = Applications[(query[0].toUpperCase())];
-			
-			
+			var space = Database[(query[0].toUpperCase())];
 			if (space) {
-				console.log('IN SPACE: ' + JSON.stringify(space));
 				for (var i = 0; i < space.length; i++) {
+					
 					var label = space[i].label.substr(0, query.length).toUpperCase();
 					if (label == query.toUpperCase()) {
+						results.push(space[i]);
+						continue;
+					}
+					
+					var term = space[i].term.substr(0, query.length).toUpperCase();
+					if (term == query.toUpperCase()) {
 						results.push(space[i]);
 					}
 				}
