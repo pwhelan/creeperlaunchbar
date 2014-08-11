@@ -10,68 +10,9 @@ var app = require('app'),
 	// Module to create native browser window.
 	BrowserWindow = require('browser-window'),
 	// Module to Activate the Global Shortcut
-	GlobalShortcut = require('global-shortcut');
-
-
-var Database = {};
-
-for (var i = 0; i <= 9; i++) {
-	Database[i] = [];
-}
-
-for (var i = 'A'.charCodeAt(0); i <= 'Z'.charCodeAt(0); i++) {
-	Database[String.fromCharCode(i)] = [];
-}
-
-Array.prototype.getUniqueByKey = function(key) {
-	var u = {}, a = [];
-	for(var i = 0, l = this.length; i < l; ++i){
-		if(u.hasOwnProperty(this[i][key])) {
-			continue;
-		}
-		a.push(this[i]);
-		u[this[i][key]] = 1;
-	}
-	return a;
-};
-
-
-require('./lib/searchers/osx/ApplicationBundles').initialize(function(entry) {
-	var part;
-	var camelcaseparts = entry.label.split(/(SQL|JSON|[A-Z]+[a-z]+)|\s|\_/);
-	
-	
-	entry.term = entry.label;
-	Database[entry.label[0].toUpperCase()].push(entry);
-	
-	
-	do {
-		part = camelcaseparts.shift();
-		
-		if (part) part = part.trim();
-		if (!part || part.length <= 0) {
-			continue;
-		}
-		
-		if (Database[part[0].toUpperCase()]) {
-			Database[part[0].toUpperCase()].push({
-				label: entry.label,
-				icon: entry.icon,
-				term: part,
-				command: {
-					channel: entry.command.channel,
-					args: entry.command.args
-				}
-			});
-		}
-		
-	} while (camelcaseparts.length > 0);
-	
-	for (var key in Database) {
-		Database[key] = Database[key].getUniqueByKey('label');
-	}
-});
-
+	GlobalShortcut = require('global-shortcut'),
+	// Database for Search Results
+	Database = require('./lib/searchers/Database');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the javascript object is GCed.
@@ -134,26 +75,7 @@ ipc
 	})
 	.on('search', function(event, query) {
 		
-		var results = [];
-		if (query.length > 0) {
-			var space = Database[(query[0].toUpperCase())];
-			if (space) {
-				for (var i = 0; i < space.length; i++) {
-					
-					var label = space[i].label.substr(0, query.length).toUpperCase();
-					if (label == query.toUpperCase()) {
-						results.push(space[i]);
-						continue;
-					}
-					
-					var term = space[i].term.substr(0, query.length).toUpperCase();
-					if (term == query.toUpperCase()) {
-						results.push(space[i]);
-					}
-				}
-			}
-		}
-		
+		var results = Database.search(query);
 		mainWindow.webContents.send('results', results);
 	})
 	.on('exec:application', function(event, appPath) {
