@@ -75,8 +75,9 @@ ipc
 	})
 	.on('search', function(event, query) {
 		
-		var results = Database.search(query);
-		mainWindow.webContents.send('results', results);
+		var results = Database.search(query, function(results) {
+			mainWindow.webContents.send('results', results);
+		});
 	});
 
 
