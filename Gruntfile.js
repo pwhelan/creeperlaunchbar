@@ -54,7 +54,7 @@ module.exports = function(grunt) {
 			args: ['./'],
 			opts: {
 				detached: true,
-				stdio: [ 'ignore', out, err ]
+				stdio: [ 'ignore', err, out ]
 			}
 		});
 		
