@@ -88,11 +88,13 @@ module.exports = function(grunt) {
 			err = fs.openSync('./console/out.log', 'a');
 		
 		var atomshell = grunt.util.spawn({
-			cmd: './binaries/Atom.app/Contents/MacOS/Atom',
+			cmd: (process.platform == 'darwin' ?
+				'./binaries/Atom.app/Contents/MacOS/Atom' :
+				'./binaries/atom'),
 			args: ['./'],
 			opts: {
 				detached: true,
-				stdio: [ 'ignore', out, err ]
+				stdio: [ 'ignore', err, out ]
 			}
 		});
 		

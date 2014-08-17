@@ -21,9 +21,11 @@ var mainWindow = null;
 
 // Register a 'ctrl+x' shortcut listener.
 app.on('ready', function() {
-	
-	app.dock.hide();
-	
+
+	if (app.dock && typeof app.dock.hide == 'function') {
+		app.dock.hide();
+	}
+
 	mainWindow = new BrowserWindow({
 		'width': 800,
 		'height': 20,
@@ -33,13 +35,13 @@ app.on('ready', function() {
 		'skip-taskbar': true,
 		'auto-hide-menu-bar': true
 	});
-	
+
 	var pos = mainWindow.getPosition();
 	mainWindow.setPosition(pos[0], 100);
-	
+
 	// and load the index.html of the app.
 	mainWindow.loadUrl('file://' + __dirname + '/index.html');
-	
+
 	// Emitted when the window is closed.
 	mainWindow
 		.on('closed', function() {
@@ -48,12 +50,12 @@ app.on('ready', function() {
 			// when you should delete the corresponding element.
 			mainWindow = null;
 		});
-	
+
 	var ret = GlobalShortcut.register('ctrl+space', function() {
-		
+
 		mainWindow.show();
 		mainWindow.focus();
-		
+
 		mainWindow.webContents.send('show-browser');
 	});
 });
@@ -67,14 +69,14 @@ ipc
 	.on('hide-window', function(event, args) {
 		var pos = mainWindow.getPosition();
 		var osize = mainWindow.getSize();
-		
+
 		mainWindow.hide();
 		mainWindow.setPosition(pos[0], 100);
-		
+
 		return false;
 	})
 	.on('search', function(event, query) {
-		
+
 		var results = Database.search(query, function(results) {
 			mainWindow.webContents.send('results', results);
 		});
@@ -83,10 +85,10 @@ ipc
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
-	
+
 	globalShortcut.unregister('ctrl+space');
 	globalShortcut.unregisterAll();
-	
+
 	if (process.platform != 'darwin')
 		app.quit();
 });
