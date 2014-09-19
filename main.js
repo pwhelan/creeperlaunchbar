@@ -21,7 +21,16 @@ var mainWindow = null;
 
 // Register a 'ctrl+x' shortcut listener.
 app.on('ready', function() {
-
+	
+	
+	if (!fs.existsSync(app.getDataPath()))
+	{
+		fs.mkdirSync(app.getDataPath());	
+	}
+	
+	Database.start(app.getDataPath() + '/database.nedb');
+	
+	
 	if (app.dock && typeof app.dock.hide == 'function') {
 		app.dock.hide();
 	}

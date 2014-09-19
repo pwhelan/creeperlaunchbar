@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 	
 	grunt.initConfig({
 		'download-atom-shell': {
-			version: '0.15.4',
+			version: '0.16.0',
 			outputDir: 'binaries',
 			downloadDir: 'cache/atom-shell-download/'
 		},
