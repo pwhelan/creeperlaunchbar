@@ -5,7 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "bootstrap": "3.2.0",
-    "desktop-entry": "0.1.0-pre",
+    "desktop-entry": "git+https://github.com/opatry/node-X11-desktop-entry/",
     "jquery": "2.1.1",
     "nedb": "^0.10.7",
     "plist": "^1.0.1"
