@@ -28,15 +28,21 @@ app.on('ready', function() {
 		fs.mkdirSync(app.getDataPath());	
 	}
 	
-	Database.start(app.getDataPath() + '/database.nedb');
+	Database.start(app);
 	
 	
 	if (app.dock && typeof app.dock.hide == 'function') {
 		app.dock.hide();
 	}
-
+	
+	var screen = require('screen');
+	var display = screen.getPrimaryDisplay();
+	var width = Math.round(display.bounds.width*0.35);
+	width = width - (width % 100);
+	console.log("WIDTH = " + width);
+	
 	mainWindow = new BrowserWindow({
-		'width': 800,
+		'width':  width,
 		'height': 20,
 		'frame': false,
 		'always-on-top': true,
