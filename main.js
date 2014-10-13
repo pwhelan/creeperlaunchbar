@@ -85,18 +85,26 @@ ipc
 		var pos = mainWindow.getPosition();
 		var osize = mainWindow.getSize();
 
+		mainWindow.webContents.send('hide-browser');
 		mainWindow.hide();
 		mainWindow.setPosition(pos[0], 100);
-
+		
 		return false;
 	})
 	.on('search', function(event, query) {
-
-		var results = Database.search(query, function(results) {
+		
+		Database.search(query, function(results) {
 			mainWindow.webContents.send('results', results);
 		});
+		
+	})
+	.on('database:context', function(event, id) {
+		
+		Database.getcontext(id, function(entries) {
+			console.log(JSON.stringify(entries));
+			mainWindow.webContents.send('results', entries);
+		});
 	});
-
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
