@@ -64,13 +64,21 @@ app.on('ready', function() {
 			// in an array if your app supports multi windows, this is the time
 			// when you should delete the corresponding element.
 			mainWindow = null;
+		})
+		.on('blur', function() {
+			var pos = mainWindow.getPosition();
+			var osize = mainWindow.getSize();
+
+			mainWindow.webContents.send('hide-browser');
+			mainWindow.hide();
+			mainWindow.setPosition(pos[0], 100);
 		});
-
+	
 	var ret = GlobalShortcut.register('ctrl+space', function() {
-
+		
 		mainWindow.show();
 		mainWindow.focus();
-
+		
 		mainWindow.webContents.send('show-browser');
 	});
 });
