@@ -1,14 +1,14 @@
 {
   "name": "creeper",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Launch Bar made with Atom Shell",
   "main": "main.js",
   "dependencies": {
     "bootstrap": "3.2.0",
     "dbus-native": "^0.1.0",
-    "desktop-entry": "git+https://github.com/opatry/node-X11-desktop-entry/",
     "jquery": "2.1.1",
     "nedb": "^0.10.7",
+    "node-x11-desktop-entry": "^0.1.1",
     "plist": "^1.0.1",
     "underscore": "^1.7.0"
   },
