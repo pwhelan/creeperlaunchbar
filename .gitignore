@@ -3,4 +3,6 @@ DEADJOE
 
 /binaries/
 /node_modules/
+/build/
 /console/
+/cache/
