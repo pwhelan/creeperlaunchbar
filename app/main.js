@@ -14,6 +14,11 @@ var app = require('app'),
 	// Database for Search Results
 	Database = require('./lib/searchers/Database');
 
+var Menu = require('menu');
+var Tray = require('tray');
+
+var appIcon = null;
+	
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the javascript object is GCed.
 var mainWindow = null;
