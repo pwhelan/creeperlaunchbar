@@ -31,15 +31,29 @@ app.on('ready', function() {
 	Database.start(app);
 	
 	
-	if (app.dock && typeof app.dock.hide == 'function') {
-		app.dock.hide();
+	try
+	{
+		appIcon = new Tray(__dirname + '/media/img/Minecraft_Creeper_2-16x16.png');
+		var contextMenu = Menu.buildFromTemplate([
+			{ label: 'Quit', click: function() { app.quit(); } }
+		]);
+		
+		appIcon.setToolTip('Creeper Launch Bar');
+		appIcon.setContextMenu(contextMenu);
 	}
+	catch (err)
+	{
+		console.log('TRAY ERROR:');
+		console.log(err);
+	}
+	
 	
 	var screen = require('screen');
 	var display = screen.getPrimaryDisplay();
-	var width = Math.round(display.bounds.width*0.35);
+	var width = Math.round(display.bounds.width*0.60);
 	width = width - (width % 100);
 	console.log("WIDTH = " + width);
+	
 	
 	mainWindow = new BrowserWindow({
 		'width':  width,
@@ -65,14 +79,19 @@ app.on('ready', function() {
 			// when you should delete the corresponding element.
 			mainWindow = null;
 		});
-
+	
+	if (app.dock && typeof app.dock.hide == 'function') {
+		app.dock.hide();
+	}
+	
 	var ret = GlobalShortcut.register('ctrl+space', function() {
-
+		
 		mainWindow.show();
 		mainWindow.focus();
 
 		mainWindow.webContents.send('show-browser');
 	});
+	
 });
 
 
