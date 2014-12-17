@@ -24,12 +24,18 @@ module.exports = function(grunt) {
 				platforms: ["darwin", "linux64"],
 				atom_shell_version: "v0.16.0"
 			}
+		},
+		'install-dependencies': {
+			options: {
+				cwd: 'app'
+			}
 		}
 	});
 	
 	grunt.loadNpmTasks('grunt-download-atom-shell');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-atom-shell-app-builder');
+	grunt.loadNpmTasks('grunt-install-dependencies');
 	
 	grunt.registerTask('atom-shell:start', 'Run Launchdd', function() {
 		
@@ -100,6 +106,7 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('atom-shell:restart', ['atom-shell:stop', 'atom-shell:start']);
 	
-	grunt.registerTask('build', ['build-atom-shell-app']);
+	grunt.registerTask('build', ['install-dependencies', 'build-atom-shell-app']);
 	
+	grunt.registerTask('default', ['install-dependencies', 'atom-shell:start']);
 };

@@ -1,20 +1,14 @@
 {
   "name": "creeper",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Launch Bar made with Atom Shell",
   "main": "app/main.js",
   "dependencies": {
-    "bootstrap": "3.2.0",
-    "desktop-entry": "git+https://github.com/opatry/node-X11-desktop-entry/",
-    "jquery": "2.1.1",
-    "nedb": "^0.10.7",
-    "plist": "^1.0.1"
-  },
-  "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-atom-shell-app-builder": "0.0.7",
     "grunt-contrib-copy": "^0.5.0",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-download-atom-shell": "^0.8.2"
+    "grunt-download-atom-shell": "^0.8.2",
+    "grunt-install-dependencies": "^0.2.0"
   }
 }
