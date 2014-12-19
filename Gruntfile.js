@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
 	
+	var AtomShellVersion = "0.17.0";
+	
 	var AppFiles = [
 		'app/main.js',
 		'app/index.html',
@@ -9,7 +11,7 @@ module.exports = function(grunt) {
 	
 	grunt.initConfig({
 		'download-atom-shell': {
-			version: '0.16.0',
+			version: AtomShellVersion,
 			outputDir: 'binaries',
 			downloadDir: 'cache/atom-shell-download/'
 		},
@@ -22,7 +24,7 @@ module.exports = function(grunt) {
 		'build-atom-shell-app': {
 			options: {
 				platforms: ["darwin", "linux64"],
-				atom_shell_version: "v0.16.0"
+				atom_shell_version: "v" + AtomShellVersion
 			}
 		},
 		'install-dependencies': {
