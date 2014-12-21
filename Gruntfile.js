@@ -1,5 +1,7 @@
 module.exports = function(grunt) {
 	
+	var when = require('when');
+	
 	var AtomShellVersion = "0.17.0";
 	
 	var AppFiles = [
@@ -31,6 +33,29 @@ module.exports = function(grunt) {
 			options: {
 				cwd: 'app'
 			}
+		},
+		'rename': {
+			'app-osx-packaged-app': {
+				files: [{
+					src: [process.cwd() + '/build/darwin/atom-shell/Creeper.app/Contents/Resources/app'],
+					dest: process.cwd() + '/build/darwin/atom-shell/Creeper.app/Contents/Resources/default_app'
+				}]
+			},
+			'app-osx': {
+				files: [{
+					src: [process.cwd() + '/build/darwin/atom-shell/Atom.app'],
+					dest: process.cwd() + '/build/darwin/atom-shell/Creeper.app'
+				}]
+			}
+		},
+		exec: {
+			'zip-app-osx': {
+				cwd: process.cwd() + '/build/darwin/atom-shell/',
+				cmd: 'zip -r Creeper.app.zip Creeper.app'
+			}
+		},
+		clean: {
+			osxdefault: [process.cwd() + '/build/darwin/atom-shell/Atom.app/Contents/Resources/default_app']
 		}
 	});
 	
@@ -38,6 +63,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-atom-shell-app-builder');
 	grunt.loadNpmTasks('grunt-install-dependencies');
+	grunt.loadNpmTasks('grunt-exec');
+	grunt.loadNpmTasks('grunt-contrib-rename');
+	grunt.loadNpmTasks('grunt-contrib-clean');
 	
 	grunt.registerTask('atom-shell:start', 'Run Launchdd', function() {
 		
@@ -108,7 +136,62 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('atom-shell:restart', ['atom-shell:stop', 'atom-shell:start']);
 	
-	grunt.registerTask('build', ['install-dependencies', 'build-atom-shell-app']);
+	grunt.registerTask('generate-icns', 'Generate ICNS File OSX App', function() {
+		var done = this.async();
+		var sizes = [ 512, 128, 64, 32, 24, 16 ];
+		var pExec = [];
+		
+		grunt.file.mkdir('build/icons');
+		grunt.file.mkdir('build/icons/Creeper.iconset');
+		
+		
+		for (var i = 0; i < sizes.length; i++) {
+			
+			var size = sizes[i];
+			
+			pExec.push(when.promise(function(resolve, reject) {
+				
+				grunt.util.spawn({
+						cmd: 'sips',
+						args: [
+							'-z', size, size,
+							'app/media/img/Minecraft_Creeper_2-64x64.png',
+							'--out', 'build/icons/Creeper.iconset/icon_' + size + 'x' + size + '.png',
+						],
+					},
+					function() {
+						resolve(1);
+					}
+				);
+				
+			}));
+		}
+		
+		when.all(pExec).then(function() {
+			grunt.util.spawn({
+					cmd: 'iconutil',
+					args:['-c', 'icns', 'build/icons/Creeper.iconset']
+				},
+				function() {
+					grunt.file.copy(
+						'build/icons/Creeper.icns', 
+						'build/darwin/atom-shell/Creeper.app/Contents/Resources/atom.icns'
+					);
+					done();
+				}
+			);
+		});
+	});
+	
+	grunt.registerTask('build', [
+		'install-dependencies',
+		'build-atom-shell-app',
+		'clean:osxdefault',
+		'rename:app-osx',
+		'generate-icns',
+		'rename:app-osx-packaged-app',
+		'exec:zip-app-osx'
+	]);
 	
 	grunt.registerTask('default', ['install-dependencies', 'atom-shell:start']);
 };
