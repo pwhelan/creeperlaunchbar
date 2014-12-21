@@ -138,7 +138,7 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('generate-icns', 'Generate ICNS File OSX App', function() {
 		var done = this.async();
-		var sizes = [ 512, 128, 64, 32, 24, 16 ];
+		var sizes = [ 512, 128, 32, 16 ];
 		var pExec = [];
 		var files = [];
 		
@@ -173,8 +173,8 @@ module.exports = function(grunt) {
 					grunt.util.spawn({
 						'cmd': 'convert',
 						args: [
-							'-resize', size+'x'+size,
 							'app/media/img/Minecraft_Creeper_2-64x64.png',
+							'-resize', size+'x'+size,
 							files[i]
 						]
 					},

@@ -10,7 +10,7 @@ before_install:
 
 install: npm install
 
-before_script: grunt build
+before_script: grunt build --force
 
 deploy:
   provider: releases
