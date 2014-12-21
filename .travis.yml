@@ -1,9 +1,17 @@
 language: node_js
+
 node_js:
-- '0.11'
-before_install: npm install -g grunt-cli
+  - '0.11'
+
+before_install: 
+  - npm install -g grunt-cli
+  - sudo apt-get install icnsutils
+  - dpkg -l
+
 install: npm install
+
 before_script: grunt build
+
 deploy:
   provider: releases
   api_key:

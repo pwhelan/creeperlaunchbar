@@ -140,6 +140,8 @@ module.exports = function(grunt) {
 		var done = this.async();
 		var sizes = [ 512, 128, 64, 32, 24, 16 ];
 		var pExec = [];
+		var files = [];
+		
 		
 		grunt.file.mkdir('build/icons');
 		grunt.file.mkdir('build/icons/Creeper.iconset');
@@ -148,38 +150,69 @@ module.exports = function(grunt) {
 		for (var i = 0; i < sizes.length; i++) {
 			
 			var size = sizes[i];
+			files[i] = 'build/icons/Creeper.iconset/icon_' + size + 'x' + size + '.png';
+			
 			
 			pExec.push(when.promise(function(resolve, reject) {
 				
-				grunt.util.spawn({
+				switch (process.platform) {
+				case 'darwin':
+					grunt.util.spawn({
 						cmd: 'sips',
 						args: [
 							'-z', size, size,
 							'app/media/img/Minecraft_Creeper_2-64x64.png',
-							'--out', 'build/icons/Creeper.iconset/icon_' + size + 'x' + size + '.png',
+							'--out', files[i]
 						],
 					},
 					function() {
 						resolve(1);
-					}
-				);
+					});
+					break;
+				case 'linux':
+					grunt.util.spawn({
+						'cmd': 'convert',
+						args: [
+							'-resize', size+'x'+size,
+							'app/media/img/Minecraft_Creeper_2-64x64.png',
+							files[i]
+						]
+					},
+					function() {
+						resolve(1);
+					});
+					break;
+				}
 				
 			}));
 		}
 		
 		when.all(pExec).then(function() {
-			grunt.util.spawn({
+			var finished = function() {
+				grunt.file.copy(
+					'build/icons/Creeper.icns', 
+					'build/darwin/atom-shell/Creeper.app/Contents/Resources/atom.icns'
+				);
+				done();
+			};
+			
+			switch (process.platform) {
+			case 'darwin':
+				grunt.util.spawn({
 					cmd: 'iconutil',
 					args:['-c', 'icns', 'build/icons/Creeper.iconset']
 				},
-				function() {
-					grunt.file.copy(
-						'build/icons/Creeper.icns', 
-						'build/darwin/atom-shell/Creeper.app/Contents/Resources/atom.icns'
-					);
-					done();
-				}
-			);
+				finished);
+				break;
+				
+			case 'linux':
+				runt.util.spawn({
+					cmd: 'png2icns',
+					args: ['build/icons/Creeper.icns'].concat(files)
+				},
+				finished);
+				break;
+			}
 		});
 	});
 	
