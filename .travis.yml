@@ -6,7 +6,6 @@ node_js:
 before_install: 
   - npm install -g grunt-cli
   - sudo apt-get install icnsutils
-  - dpkg -l
 
 install: npm install
 
