@@ -206,7 +206,7 @@ module.exports = function(grunt) {
 				break;
 				
 			case 'linux':
-				runt.util.spawn({
+				grunt.util.spawn({
 					cmd: 'png2icns',
 					args: ['build/icons/Creeper.icns'].concat(files)
 				},
