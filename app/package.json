@@ -1,6 +1,6 @@
 {
   "name": "creeper",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "description": "Launch Bar made with Atom Shell",
   "main": "main.js",
   "dependencies": {
