@@ -1,7 +1,14 @@
 language: node_js
 node_js:
-  - "0.11"
-
+- '0.11'
 before_install: npm install -g grunt-cli
 install: npm install
 before_script: grunt build
+deploy:
+  provider: releases
+  api_key:
+    secure: IwQ8gjMv7c25PyCtvEzyFoocdQsVBfD5kl7EqOJnKnK8qohJe2NMa8o1mKki970BMtj63dkU5VfNEVeK+mA3EpctH2B89DuXv7v8OPM7nz7/G2EUbUcEAbFfN5f7DG1ya8i/lq4h6UoOJj139pbvfbus2l52CZG+QfHiaB1jniM=
+  file: build/darwin/atom-shell/Creeper.app.zip
+  on:
+    tags: true
+    all_branches: true
