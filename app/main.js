@@ -23,6 +23,119 @@ var appIcon = null;
 // be closed automatically when the javascript object is GCed.
 var mainWindow = null;
 
+var startAtLogin = -1;
+var changeAutoStart = function() {};
+
+function refreshTrayMenu()
+{
+	var menu = [];
+	
+	if (startAtLogin != -1)
+	{
+		menu.push({ 
+			label: 'Start at Login', 
+			type: 'checkbox', 
+			checked: startAtLogin, 
+			click: changeAutoStart 
+		});
+	}
+	
+	menu.push({
+		label: 'Quit', 
+		click: function() { app.quit(); } 
+	});
+	
+	appIcon.setContextMenu(Menu.buildFromTemplate(menu));
+}
+
+switch(process.platform)
+{
+	case 'darwin':
+		// Support for PList files on OSX
+		var plist = require('plist');
+		var programLabel = 'org.pwhelan.' + app.getName();
+		var plistFile = process.env.HOME + '/Library/LaunchAgents/' + programLabel + '.plist';
+		
+		
+		(function() {
+			// Make sure to resolve paths to absolute paths
+			var args = process.argv;
+			for (var arg in args)
+			{
+				var realpath = path.resolve(args[arg]);
+				
+				if (realpath && realpath != args[arg])
+				{
+					args[arg] = realpath;
+				}
+			}
+			
+			
+			fs.exists(plistFile, function (exists) {
+				if (exists)
+				{
+					fs.readFile(plistFile, function (err, data) {
+						if (err) throw err;
+						try
+						{
+							var plistData = plist.parse(data.toString());
+							startAtLogin = plistData.RunAtLoad;
+							refreshTrayMenu();
+						}
+						catch (e) {}
+					});
+					return;
+				}
+				
+				fs.writeFile(plistFile, plist.build({ 
+					Label: programLabel,
+					KeepAlive: {
+						SuccessfulExit: false
+					},
+					programArguments: process.argv,
+					RunAtLoad: true,
+					AbandonProcessGroup: true
+				}), function() {
+				});
+			});
+			
+		})();
+		
+		changeAutoStart = function()
+		{
+			console.error('CHANGE AUTOSTART');
+			fs.readFile(plistFile, function (err, data) {
+				var plistData;
+				
+				if (err) throw err;
+				try
+				{
+					plistData = plist.parse(data.toString());
+					plistData.RunAtLoad = !plistData.RunAtLoad;
+				}
+				catch (e) {}
+				
+				console.error('PLIST DATA = ');
+				console.error(plistData);
+				
+				fs.writeFile(plistFile, plist.build(plistData), function(err) {
+					if (err) throw err;
+					
+					startAtLogin = plistData.RunAtLoad;
+					refreshTrayMenu();
+				});
+				
+			});
+		};
+		
+		break;
+	default:
+		changeAutoStart = function ()
+		{
+			// NOT SUPPORTED!
+		};
+		break;
+}
 
 // Register a 'ctrl+x' shortcut listener.
 app.on('ready', function() {
@@ -39,12 +152,9 @@ app.on('ready', function() {
 	try
 	{
 		appIcon = new Tray(__dirname + '/media/img/Minecraft_Creeper_2-16x16.png');
-		var contextMenu = Menu.buildFromTemplate([
-			{ label: 'Quit', click: function() { app.quit(); } }
-		]);
 		
 		appIcon.setToolTip('Creeper Launch Bar');
-		appIcon.setContextMenu(contextMenu);
+		refreshTrayMenu();
 	}
 	catch (err)
 	{
