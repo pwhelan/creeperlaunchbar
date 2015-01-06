@@ -103,7 +103,6 @@ switch(process.platform)
 		
 		changeAutoStart = function()
 		{
-			console.error('CHANGE AUTOSTART');
 			fs.readFile(plistFile, function (err, data) {
 				var plistData;
 				
