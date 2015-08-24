@@ -10,7 +10,7 @@ var fs = require('fs'),
 	_ = require('underscore');
 
 
-var desktopEntry = require('desktop-entry');
+var desktopEntry = require('node-x11-desktop-entry');
 
 function checksum (str, algorithm, encoding) {
 	return crypto

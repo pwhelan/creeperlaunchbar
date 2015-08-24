@@ -128,7 +128,7 @@ $('body').on('keydown', function(ev) {
 			
 			repeatkeys[ev.which] = setInterval(
 				function() {
-					$('body').keydown(ev)
+					$('body').keydown(ev);
 				},
 				500
 			);
@@ -145,7 +145,7 @@ $('body').on('keydown', function(ev) {
 		}
 	}
 	
-	console.log('KEY = ' + ev.which + ' METAKEY = ' + ev.metaKey);
+	//console.log('KEY = ' + ev.which + ' METAKEY = ' + ev.metaKey);
 	return true;
 });
 
@@ -226,7 +226,7 @@ ipc.on('results', function(results) {
 		})
 	);
 	
-	
+	$('body').height(80 + $('#results').height());
 	$('#results li:first').addClass('active');
 	
 	setTimeout(function() {

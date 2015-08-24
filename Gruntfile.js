@@ -2,8 +2,6 @@ module.exports = function(grunt) {
 	
 	var when = require('when');
 	
-	var AtomShellVersion = "0.17.0";
-	
 	var AppFiles = [
 		'app/main.js',
 		'app/index.html',
@@ -12,21 +10,10 @@ module.exports = function(grunt) {
 	];
 	
 	grunt.initConfig({
-		'download-atom-shell': {
-			version: AtomShellVersion,
-			outputDir: 'binaries',
-			downloadDir: 'cache/atom-shell-download/'
-		},
 		watch: {
-			'atom-shell': {
+			'electron': {
 				files: AppFiles,
-				tasks: ['atom-shell:restart']
-			}
-		},
-		'build-atom-shell-app': {
-			options: {
-				platforms: ["darwin", "linux64"],
-				atom_shell_version: "v" + AtomShellVersion
+				tasks: ['electron:restart']
 			}
 		},
 		'install-dependencies': {
@@ -37,37 +24,41 @@ module.exports = function(grunt) {
 		'rename': {
 			'app-osx-packaged-app': {
 				files: [{
-					src: [process.cwd() + '/build/darwin/atom-shell/Creeper.app/Contents/Resources/app'],
-					dest: process.cwd() + '/build/darwin/atom-shell/Creeper.app/Contents/Resources/default_app'
+					src: [process.cwd() + '/build/darwin/electron/Creeper.app/Contents/Resources/app'],
+					dest: process.cwd() + '/build/darwin/electron/Creeper.app/Contents/Resources/default_app'
 				}]
 			},
 			'app-osx': {
 				files: [{
-					src: [process.cwd() + '/build/darwin/atom-shell/Atom.app'],
-					dest: process.cwd() + '/build/darwin/atom-shell/Creeper.app'
+					src: [process.cwd() + '/build/darwin/electron/Electron.app'],
+					dest: process.cwd() + '/build/darwin/electron/Creeper.app'
 				}]
 			}
 		},
 		exec: {
 			'zip-app-osx': {
-				cwd: process.cwd() + '/build/darwin/atom-shell/',
+				cwd: process.cwd() + '/build/darwin/electron/',
 				cmd: 'zip -r Creeper.app.zip Creeper.app'
 			}
 		},
 		clean: {
-			osxdefault: [process.cwd() + '/build/darwin/atom-shell/Atom.app/Contents/Resources/default_app']
+			osxdefault: [process.cwd() + '/build/darwin/electron/Electron.app/Contents/Resources/default_app']
+		},
+		'build-electron-app': {
+			options: {
+				platforms: ["darwin", "linux64"]
+			}
 		}
 	});
 	
-	grunt.loadNpmTasks('grunt-download-atom-shell');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.loadNpmTasks('grunt-atom-shell-app-builder');
 	grunt.loadNpmTasks('grunt-install-dependencies');
 	grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-contrib-rename');
 	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-electron-app-builder');
 	
-	grunt.registerTask('atom-shell:start', 'Run Launchdd', function() {
+	grunt.registerTask('electron:start', 'Run Launchdd', function() {
 		
 		if (!grunt.file.exists('./console/')) {
 			grunt.file.mkdir('./console');
@@ -76,13 +67,13 @@ module.exports = function(grunt) {
 		var fs = require('fs');
 		
 		try {
-			var oldpid = fs.readFileSync('./console/atom-shell.pid');
+			var oldpid = fs.readFileSync('./console/electron.pid');
 			if (oldpid) {
 				try {
 					process.kill(parseInt(oldpid), 0);
 				}
 				catch(err) {
-					console.log('Atom Shell already running');
+					console.log('Electron is already running');
 					return;
 				}
 			}
@@ -93,10 +84,8 @@ module.exports = function(grunt) {
 		var out = fs.openSync('./console/err.log', 'a'),
 			err = fs.openSync('./console/out.log', 'a');
 		
-		var atomshell = grunt.util.spawn({
-			cmd: (process.platform == 'darwin' ?
-				'./binaries/Atom.app/Contents/MacOS/Atom' :
-				'./binaries/atom'),
+		var electron = grunt.util.spawn({
+			cmd: 'electron',
 			args: ['./app'],
 			opts: {
 				detached: true,
@@ -104,11 +93,11 @@ module.exports = function(grunt) {
 			}
 		});
 		
-		console.log('Running Atom Shell in ' + atomshell.pid);
-		fs.writeFileSync('./console/atom-shell.pid', atomshell.pid + "\n", {flag: "w+"});
+		console.log('Running Electron in ' + electron.pid);
+		fs.writeFileSync('./console/electron.pid', electron.pid + "\n", {flag: "w+"});
 	});
 	
-	grunt.registerTask('atom-shell:stop', 'Kill Launchdd', function() {
+	grunt.registerTask('electron:stop', 'Kill Launchdd', function() {
 		
 		if (!grunt.file.exists('./console/')) {
 			return;
@@ -116,25 +105,25 @@ module.exports = function(grunt) {
 		
 		var fs = require('fs');
 		try {
-			var oldpid = fs.readFileSync('./console/atom-shell.pid');
+			var oldpid = fs.readFileSync('./console/electron.pid');
 			if (oldpid) {
 				try {
 					process.kill(parseInt(oldpid), 'SIGTERM');
-					console.log('Shut down Atom Shell running with pid ' + parseInt(oldpid));
+					console.log('Shut down Electron running with pid ' + parseInt(oldpid));
 				}
 				catch(err) {
-					console.log('Atom Shell is not running');
+					console.log('Electron is not running');
 					return;
 				}
 				finally {
-					fs.unlinkSync('./console/atom-shell.pid');
+					fs.unlinkSync('./console/electron.pid');
 				}
 			}
 		}
 		catch (err) {}
 	});
 	
-	grunt.registerTask('atom-shell:restart', ['atom-shell:stop', 'atom-shell:start']);
+	grunt.registerTask('electron:restart', ['electron:stop', 'electron:start']);
 	
 	grunt.registerTask('generate-icns', 'Generate ICNS File OSX App', function() {
 		var done = this.async();
@@ -191,7 +180,7 @@ module.exports = function(grunt) {
 			var finished = function() {
 				grunt.file.copy(
 					'build/icons/Creeper.icns', 
-					'build/darwin/atom-shell/Creeper.app/Contents/Resources/atom.icns'
+					'build/darwin/electron/Creeper.app/Contents/Resources/atom.icns'
 				);
 				done();
 			};
@@ -218,7 +207,7 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('build', [
 		'install-dependencies',
-		'build-atom-shell-app',
+		'build-electron-app',
 		'clean:osxdefault',
 		'rename:app-osx',
 		'generate-icns',
@@ -226,5 +215,5 @@ module.exports = function(grunt) {
 		'exec:zip-app-osx'
 	]);
 	
-	grunt.registerTask('default', ['install-dependencies', 'atom-shell:start']);
+	grunt.registerTask('default', ['install-dependencies', 'electron:start']);
 };
