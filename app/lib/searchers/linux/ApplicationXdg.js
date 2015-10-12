@@ -64,7 +64,7 @@ var ParseDesktopEntry = function(fpath, Database)
 			var _getIconPath = function(iconpath)
 			{
 				var res = ['48x48', '64x64', '128x128', 'scalable']
-				var actions = ['apps', 'actions', 'mimetypes', 'devices'];
+				var actions = ['apps', 'actions', 'mimetypes', 'devices', 'categories'];
 				
 				for (var r in res)
 				{
@@ -89,6 +89,8 @@ var ParseDesktopEntry = function(fpath, Database)
 						}
 					}
 				}
+				
+				return null;
 			};
 			
 			var entry = model["Desktop Entry"];
@@ -223,64 +225,50 @@ var ParseDesktopEntry = function(fpath, Database)
 				// Now we try to convert the icon from a pixmap
 				if (iconPath === null)
 				{
-					if (fs.existsSync('/usr/share/pixmaps/' + entry.Icon))
+					
+					var _getPixmap = function(entry)
 					{
-						iconPath = '/usr/share/pixmaps/' + entry.Icon;
-						if (entry.Icon.indexOf('.') > 0)
+						var formats = [
+							{ext: '', convert: false},
+							{ext: '.png', convert: false},
+							{ext: '.jpg', convert: false},
+							{ext: '.jpeg', convert: false},
+							{ext: '.xpm', convert: true},
+							{ext: '.svg', convert: true},
+						];
+						var format;
+						
+						for (var f in formats)
 						{
-							var ext = entry.Icon.substr(entry.Icon.lastIndexOf('.'));
-							if (ext != 'jpg' && ext != 'png')
+							format = formats[f];
+							
+							console.log("PIXMAP TRY = " + '/usr/share/pixmaps/' + entry.Icon + format.ext);
+							if (fs.existsSync('/usr/share/pixmaps/' + entry.Icon + format.ext))
 							{
-								iconPath = Database.app.getDataPath() + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
-								console.log("CONVERT " + entry.Icon + " -> " + iconPath);
-								var convert = spawn('convert', ['/usr/share/pixmaps/' + entry.Icon, iconPath]);
-								
-								
-								convert.stdout.on('data', function(err, data) {
-									console.log('CONVERT -> ' + data);
-								});
-								
-								convert.stderr.on('data', function(err, data) {
-									console.error('CONVERT(ERROR) -> ' + data);
-								});
+								if (format.convert)
+								{
+									var iconPath = Database.app.getDataPath() + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
+									console.log("CONVERT " + entry.Icon + " -> " + iconPath);
+									var convert = spawn('convert', ['/usr/share/pixmaps/' + entry.Icon, iconPath]);
+									
+									
+									convert.stdout.on('data', function(err, data) {
+										console.log('CONVERT -> ' + data);
+									});
+									
+									convert.stderr.on('data', function(err, data) {
+										console.error('CONVERT(ERROR) -> ' + data);
+									});
+								}
+								else
+								{
+									return '/usr/share/pixmaps/' + entry.Icon + format.ext;
+								}
 							}
 						}
-						
-					}
-					else if (fs.existsSync('/usr/share/pixmaps/' + entry.Icon + '.png'))
-					{
-						iconPath = '/usr/share/pixmaps/' + entry.Icon + '.png';
-					}
-					if (fs.existsSync('/usr/share/pixmaps/' + entry.Icon + '.xpm')) {
-						iconPath = Database.app.getDataPath() + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
-						console.log("CONVERT " + entry.Icon + " -> " + iconPath);
-						var convert = spawn('convert', ['/usr/share/pixmaps/' + entry.Icon + '.xpm', iconPath]);
-						
-						
-						convert.stdout.on('data', function(err, data) {
-							console.log('CONVERT -> ' + data);
-						});
-						
-						convert.stderr.on('data', function(err, data) {
-							console.error('CONVERT(ERROR) -> ' + data);
-						});
-						
-					}
-					if (fs.existsSync('/usr/share/pixmaps/' + entry.Icon + '.svg')) {
-						iconPath = Database.app.getDataPath() + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
-						console.log("CONVERT " + entry.Icon + " -> " + iconPath);
-						var convert = spawn('convert', ['/usr/share/pixmaps/' + entry.Icon + '.svg', iconPath]);
-						
-						
-						convert.stdout.on('data', function(err, data) {
-							console.log('CONVERT -> ' + data);
-						});
-						
-						convert.stderr.on('data', function(err, data) {
-							console.error('CONVERT(ERROR) -> ' + data);
-						});
-						
-					}
+					};
+					
+					iconPath = _getPixmap(entry);
 				}
 				
 				
