@@ -266,6 +266,21 @@ var ParseDesktopEntry = function(fpath, Database)
 						});
 						
 					}
+					if (fs.existsSync('/usr/share/pixmaps/' + entry.Icon + '.svg')) {
+						iconPath = Database.app.getDataPath() + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
+						console.log("CONVERT " + entry.Icon + " -> " + iconPath);
+						var convert = spawn('convert', ['/usr/share/pixmaps/' + entry.Icon + '.svg', iconPath]);
+						
+						
+						convert.stdout.on('data', function(err, data) {
+							console.log('CONVERT -> ' + data);
+						});
+						
+						convert.stderr.on('data', function(err, data) {
+							console.error('CONVERT(ERROR) -> ' + data);
+						});
+						
+					}
 				}
 				
 				
