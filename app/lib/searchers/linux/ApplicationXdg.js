@@ -140,8 +140,8 @@ var ParseDesktopEntry = function(fpath, Database)
 					.filter(function(onlyin) { 
 						return onlyin.length > 0;
 					});
-					
-				if (onlyshow[0] == 'Unity' && onlyshow.length == 1)
+				
+				if ((onlyshow[0] == 'Unity' || onlyshow[0] == 'XFCE') && onlyshow.length == 1)
 				{
 					return;
 				}
