@@ -268,8 +268,15 @@ function getLoadSearchModules(app, sdir) {
 			console.error('Unable to read modules: ' + err);
 			return;
 		}
+		var ext;
 		
-		for (var i = 0; i < files.length; i++) {
+		for (var i = 0; i < files.length; i++) 
+		{
+			ext = files[i].substr(files[i].lastIndexOf('.'));
+			if (ext != '.js')
+			{
+				continue;
+			}
 			
 			var moduleName = files[i].substr(0, files[i].lastIndexOf('.'));
 			var fqmn = path.join(sdir, moduleName).replace(path.sep, '.');
