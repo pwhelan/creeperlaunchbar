@@ -377,7 +377,7 @@ ipc.on('exec:applicationxdg', function(event, appPath) {
 		spawn(
 			'/bin/bash', 
 			['-c', execPath.join(' ')],
-			{detached: true, cwd: process.env.HOME}
+			{detached: false, cwd: process.env.HOME}
 		);
 	}
 	catch(msg) {
