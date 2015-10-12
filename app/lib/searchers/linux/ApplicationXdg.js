@@ -51,8 +51,9 @@ var ParseDesktopEntry = function(fpath, Database)
 		'/usr/share/icons/unity-icon-theme',
 		'/usr/share/icons/unity-webapps-applications',
 		'/usr/share/icons/whiteglass',
-		'/usr/local/share/icons/hicolor/',
-		process.env.HOME + '/.local/share/icons/hicolor/'
+		'/usr/local/share/icons/hicolor',
+		'/usr/share/icons/hicolor',
+		process.env.HOME + '/.local/share/icons/hicolor'
 	];
 	
 	
