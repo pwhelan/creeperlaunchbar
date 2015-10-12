@@ -59,6 +59,37 @@ var ParseDesktopEntry = function(fpath, Database)
 	desktopEntry.load({
 		entry: fpath,
 		onSuccess:function(model) {
+			
+			var _getIconPath = function(iconpath)
+			{
+				var res = ['48x48', '64x64', '128x128', 'scalable']
+				var actions = ['apps', 'actions', 'mimetypes', 'devices'];
+				
+				for (var r in res)
+				{
+					console.log("RES = " + r + "->" + res[r]);
+					
+					for (var a in actions)
+					{
+						console.log("ACTION = " + a + "->" + actions[r]);
+						
+						iconPathTry = iconpath + 
+							'/' +
+							res[r] + '/' +
+							actions[a] + '/' +
+							entry.Icon + 
+							(res[r] == 'scalable' ? '.svg' : '.png');
+						
+						console.log("ICON PATH TRY " + res[r] + ":" + actions[a] + " " + iconPathTry);
+						if (fs.existsSync(iconPathTry))
+						{
+							console.log("ICONPATH=" + iconPath);
+							return iconPathTry;
+						}
+					}
+				}
+			};
+			
 			var entry = model["Desktop Entry"];
 			var iconPath = null;
 			var iconPathTry = null;
@@ -166,39 +197,12 @@ var ParseDesktopEntry = function(fpath, Database)
 					}
 					
 					// Try the hard coded icon paths for 48x48 sized icons
-					for (var f in iconpaths) {
-						iconPathTry = iconpaths[f] + '/48x48/apps/' + entry.Icon + '.png';
-						if (fs.existsSync(iconPathTry))
+					for (var f in iconpaths) 
+					{
+						iconPath = _getIconPath(iconpaths[f]);
+						if (iconPath)
 						{
-							iconPath = iconPathTry;
 							break;
-						}
-					}
-					
-					// Try the hard coded icon paths for scalable icons
-					if (iconPath === null)
-					{
-						for (var f in iconpaths) {
-							iconPathTry = iconpaths[f] + '/scalable/apps/' + entry.Icon + '.svg';
-							if (fs.existsSync(iconPathTry))
-							{
-								iconPath = iconPathTry;
-								break;
-							}
-						}
-					}
-					
-					// Try the hard coded icon paths for 48x48 device icons
-					// Worth a shot...
-					if (iconPath === null)
-					{
-						for (var f in iconpaths) {
-							iconPathTry = iconpaths[f] + '/48x48/devices/' + entry.Icon + '.png';
-							if (fs.existsSync(iconPathTry))
-							{
-								iconPath = iconPathTry;
-								break;
-							}
 						}
 					}
 					
