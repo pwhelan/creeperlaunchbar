@@ -5,7 +5,7 @@ var Database = {};
 var Datastore = require('nedb'), db;
 var path = require('path'),
 	fs = require('fs');
-var exploreDirectory = require('../exploreDirectory').exploreDirectory
+var exploreDirectory = require('../exploreDirectory').exploreDirectory;
 
 
 Database.search = function(query, callback)
