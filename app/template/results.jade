@@ -1,5 +1,6 @@
 a.clearfix.list-group-item(id="result-" + number)
-	img.pull-left(width="58", height="58", src=icon)
+	if icon
+		img.pull-left(width="58", height="58", src=icon)
 	.pull-left(style={
 		'margin-left': '5px',
 		overflow: 'hidden',
