@@ -10,10 +10,31 @@ module.exports = function(grunt) {
 	];
 	
 	grunt.initConfig({
+		jade: {
+			index: {
+				files: {'app/index.html': ["app/template/index.jade"]}
+			},
+			results: {
+				options: {
+					namespace: false,
+					client: true,
+					name: 'template_results'
+				},
+				files: {'app/lib/results.js': ["app/template/results.jade"]}
+			}
+		},
 		watch: {
 			'electron': {
 				files: AppFiles,
 				tasks: ['electron:restart']
+			},
+			'jade:index': {
+				files: ['app/template/index.jade'],
+				tasks: ['jade:index']
+			},
+			'jade:results': {
+				files: ['app/template/results.jade'],
+				tasks: ['jade:results']
 			}
 		},
 		'install-dependencies': {
@@ -57,6 +78,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-rename');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-electron-app-builder');
+	grunt.loadNpmTasks('grunt-contrib-jade');
 	
 	grunt.registerTask('electron:start', 'Run Launchdd', function() {
 		

@@ -15,5 +15,8 @@
     "grunt-install-dependencies": "^0.2.0",
     "jade": "^1.11.0",
     "when": "^3.6.4"
+  },
+  "devDependencies": {
+    "grunt-contrib-jade": "^0.15.0"
   }
 }
