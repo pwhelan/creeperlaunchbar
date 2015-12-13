@@ -63,7 +63,7 @@ var ParseDesktopEntry = function(fpath, Database)
 			
 			var _getIconPath = function(iconpath)
 			{
-				var res = ['48x48', '64x64', '128x128', 'scalable']
+				var res = ['48x48', '64x64', '128x128', 'scalable'];
 				var actions = ['apps', 'actions', 'mimetypes', 'devices', 'categories'];
 				
 				for (var r in res)

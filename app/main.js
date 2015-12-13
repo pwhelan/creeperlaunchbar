@@ -218,6 +218,11 @@ app.on('ready', function() {
 		app.dock.hide();
 	}
 	
+	mainWindow.webContents.send(
+		'set-max-height',
+		display.size.height - 84 * 2
+	);
+	
 	var ret = GlobalShortcut.register('ctrl+space', function() {
 		
 		var cursor = screen.getCursorScreenPoint();
@@ -231,6 +236,10 @@ app.on('ready', function() {
 		}
 		mainWindow.setPosition(curx+((displays[i].bounds.width-width)/2), 100);
 		
+		mainWindow.webContents.send(
+			'set-max-height',
+			display.size.height - 84 * 2
+		);
 		
 		mainWindow.show();
 		mainWindow.focus();
