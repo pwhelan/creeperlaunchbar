@@ -198,7 +198,7 @@ ipc.on('results', function(results) {
 				.addClass('list-group-item')
 				.append(
 					'<img class="pull-left" width="58" height="58" src="' + result.icon + '"/>' +
-					'<div class="pull-left" style="margin-left: 5px;overflow:hidden;white-space:nowrap;max-width:620px">' +
+					'<div class="pull-left" style="margin-left: 5px;overflow:hidden;white-space:nowrap;max-width:560px">' +
 						'<h4>' +
 							'<span style="color:black">' +
 								result.label +
