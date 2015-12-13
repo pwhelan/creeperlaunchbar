@@ -179,6 +179,11 @@ ipc.on('show-browser', function() {
 	$('#query').focus();
 });
 
+ipc.on('set-max-height', function(maxHeight) {
+	$('body').css('max-height', maxHeight);
+	$('#results').css('max-height', maxHeight - 80);
+});
+
 ipc.on('results', function(results) {
 	
 	var resnum = 0;
