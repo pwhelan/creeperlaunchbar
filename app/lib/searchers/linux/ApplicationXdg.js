@@ -51,14 +51,48 @@ var ParseDesktopEntry = function(fpath, Database)
 		'/usr/share/icons/unity-icon-theme',
 		'/usr/share/icons/unity-webapps-applications',
 		'/usr/share/icons/whiteglass',
-		'/usr/local/share/icons/hicolor/',
-		process.env.HOME + '/.local/share/icons/hicolor/'
+		'/usr/local/share/icons/hicolor',
+		'/usr/share/icons/hicolor',
+		process.env.HOME + '/.local/share/icons/hicolor'
 	];
 	
 	
 	desktopEntry.load({
 		entry: fpath,
 		onSuccess:function(model) {
+			
+			var _getIconPath = function(iconpath)
+			{
+				var res = ['48x48', '64x64', '128x128', 'scalable'];
+				var actions = ['apps', 'actions', 'mimetypes', 'devices', 'categories'];
+				
+				for (var r in res)
+				{
+					console.log("RES = " + r + "->" + res[r]);
+					
+					for (var a in actions)
+					{
+						console.log("ACTION = " + a + "->" + actions[r]);
+						
+						iconPathTry = iconpath + 
+							'/' +
+							res[r] + '/' +
+							actions[a] + '/' +
+							entry.Icon + 
+							(res[r] == 'scalable' ? '.svg' : '.png');
+						
+						console.log("ICON PATH TRY " + res[r] + ":" + actions[a] + " " + iconPathTry);
+						if (fs.existsSync(iconPathTry))
+						{
+							console.log("ICONPATH=" + iconPath);
+							return iconPathTry;
+						}
+					}
+				}
+				
+				return null;
+			};
+			
 			var entry = model["Desktop Entry"];
 			var iconPath = null;
 			var iconPathTry = null;
@@ -108,8 +142,8 @@ var ParseDesktopEntry = function(fpath, Database)
 					.filter(function(onlyin) { 
 						return onlyin.length > 0;
 					});
-					
-				if (onlyshow[0] == 'Unity' && onlyshow.length == 1)
+				
+				if ((onlyshow[0] == 'Unity' || onlyshow[0] == 'XFCE') && onlyshow.length == 1)
 				{
 					return;
 				}
@@ -166,39 +200,12 @@ var ParseDesktopEntry = function(fpath, Database)
 					}
 					
 					// Try the hard coded icon paths for 48x48 sized icons
-					for (var f in iconpaths) {
-						iconPathTry = iconpaths[f] + '/48x48/apps/' + entry.Icon + '.png';
-						if (fs.existsSync(iconPathTry))
+					for (var f in iconpaths) 
+					{
+						iconPath = _getIconPath(iconpaths[f]);
+						if (iconPath)
 						{
-							iconPath = iconPathTry;
 							break;
-						}
-					}
-					
-					// Try the hard coded icon paths for scalable icons
-					if (iconPath === null)
-					{
-						for (var f in iconpaths) {
-							iconPathTry = iconpaths[f] + '/scalable/apps/' + entry.Icon + '.svg';
-							if (fs.existsSync(iconPathTry))
-							{
-								iconPath = iconPathTry;
-								break;
-							}
-						}
-					}
-					
-					// Try the hard coded icon paths for 48x48 device icons
-					// Worth a shot...
-					if (iconPath === null)
-					{
-						for (var f in iconpaths) {
-							iconPathTry = iconpaths[f] + '/48x48/devices/' + entry.Icon + '.png';
-							if (fs.existsSync(iconPathTry))
-							{
-								iconPath = iconPathTry;
-								break;
-							}
 						}
 					}
 					
@@ -218,49 +225,50 @@ var ParseDesktopEntry = function(fpath, Database)
 				// Now we try to convert the icon from a pixmap
 				if (iconPath === null)
 				{
-					if (fs.existsSync('/usr/share/pixmaps/' + entry.Icon))
+					
+					var _getPixmap = function(entry)
 					{
-						iconPath = '/usr/share/pixmaps/' + entry.Icon;
-						if (entry.Icon.indexOf('.') > 0)
+						var formats = [
+							{ext: '', convert: false},
+							{ext: '.png', convert: false},
+							{ext: '.jpg', convert: false},
+							{ext: '.jpeg', convert: false},
+							{ext: '.xpm', convert: true},
+							{ext: '.svg', convert: true},
+						];
+						var format;
+						
+						for (var f in formats)
 						{
-							var ext = entry.Icon.substr(entry.Icon.lastIndexOf('.'));
-							if (ext != 'jpg' && ext != 'png')
+							format = formats[f];
+							
+							console.log("PIXMAP TRY = " + '/usr/share/pixmaps/' + entry.Icon + format.ext);
+							if (fs.existsSync('/usr/share/pixmaps/' + entry.Icon + format.ext))
 							{
-								iconPath = Database.app.getDataPath() + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
-								console.log("CONVERT " + entry.Icon + " -> " + iconPath);
-								var convert = spawn('convert', ['/usr/share/pixmaps/' + entry.Icon, iconPath]);
-								
-								
-								convert.stdout.on('data', function(err, data) {
-									console.log('CONVERT -> ' + data);
-								});
-								
-								convert.stderr.on('data', function(err, data) {
-									console.error('CONVERT(ERROR) -> ' + data);
-								});
+								if (format.convert)
+								{
+									var iconPath = Database.app.getDataPath() + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
+									console.log("CONVERT " + entry.Icon + " -> " + iconPath);
+									var convert = spawn('convert', ['/usr/share/pixmaps/' + entry.Icon, iconPath]);
+									
+									
+									convert.stdout.on('data', function(err, data) {
+										console.log('CONVERT -> ' + data);
+									});
+									
+									convert.stderr.on('data', function(err, data) {
+										console.error('CONVERT(ERROR) -> ' + data);
+									});
+								}
+								else
+								{
+									return '/usr/share/pixmaps/' + entry.Icon + format.ext;
+								}
 							}
 						}
-						
-					}
-					else if (fs.existsSync('/usr/share/pixmaps/' + entry.Icon + '.png'))
-					{
-						iconPath = '/usr/share/pixmaps/' + entry.Icon + '.png';
-					}
-					if (fs.existsSync('/usr/share/pixmaps/' + entry.Icon + '.xpm')) {
-						iconPath = Database.app.getDataPath() + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
-						console.log("CONVERT " + entry.Icon + " -> " + iconPath);
-						var convert = spawn('convert', ['/usr/share/pixmaps/' + entry.Icon + '.xpm', iconPath]);
-						
-						
-						convert.stdout.on('data', function(err, data) {
-							console.log('CONVERT -> ' + data);
-						});
-						
-						convert.stderr.on('data', function(err, data) {
-							console.error('CONVERT(ERROR) -> ' + data);
-						});
-						
-					}
+					};
+					
+					iconPath = _getPixmap(entry);
 				}
 				
 				
@@ -377,7 +385,7 @@ ipc.on('exec:applicationxdg', function(event, appPath) {
 		spawn(
 			'/bin/bash', 
 			['-c', execPath.join(' ')],
-			{detached: true, cwd: process.env.HOME}
+			{detached: false, cwd: process.env.HOME}
 		);
 	}
 	catch(msg) {

@@ -163,27 +163,44 @@ app.on('ready', function() {
 	
 	var screen = require('screen');
 	var display = screen.getPrimaryDisplay();
+	var displays = screen.getAllDisplays();
 	var width = Math.round(display.bounds.width*0.60);
 	width = width - (width % 100);
 	console.log("WIDTH = " + width);
+	var cursor = screen.getCursorScreenPoint();
 	
+	for (var i = 0, curx = 0; i < displays.length; i++)
+	{
+		if (cursor.x < (curx + displays[i].bounds.width))
+		{
+			break;
+		}
+		curx += displays[i].bounds.width;
+	}
 	
 	mainWindow = new BrowserWindow({
 		'width':  width,
-		'height': 20,
+		'height': 84,
 		'frame': false,
 		'always-on-top': true,
 		'show': false,
 		'skip-taskbar': true,
-		'auto-hide-menu-bar': true
+		'auto-hide-menu-bar': true,
+		'type': 'panel'
 	});
-
-	var pos = mainWindow.getPosition();
-	mainWindow.setPosition(pos[0], 100);
-
+	
+	console.log({
+		boundswidth: displays[i].bounds.width,
+		width: width,
+		curx: curx
+	});
+	
+	/** MULTI MONITOR SUPPORT !!! */
+	mainWindow.setPosition(curx+((displays[i].bounds.width-width)/2), 100);
+	
 	// and load the index.html of the app.
 	mainWindow.loadUrl('file://' + __dirname + '/index.html');
-
+	
 	// Emitted when the window is closed.
 	mainWindow
 		.on('closed', function() {
@@ -201,7 +218,28 @@ app.on('ready', function() {
 		app.dock.hide();
 	}
 	
+	mainWindow.webContents.send(
+		'set-max-height',
+		display.size.height - 84 * 2
+	);
+	
 	var ret = GlobalShortcut.register('ctrl+space', function() {
+		
+		var cursor = screen.getCursorScreenPoint();
+		for (var i = 0, curx = 0; i < displays.length; i++)
+		{
+			if (cursor.x < (curx + displays[i].bounds.width))
+			{
+				break;
+			}
+			curx += displays[i].bounds.width;
+		}
+		mainWindow.setPosition(curx+((displays[i].bounds.width-width)/2), 100);
+		
+		mainWindow.webContents.send(
+			'set-max-height',
+			display.size.height - 84 * 2
+		);
 		
 		mainWindow.show();
 		mainWindow.focus();

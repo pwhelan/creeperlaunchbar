@@ -179,6 +179,11 @@ ipc.on('show-browser', function() {
 	$('#query').focus();
 });
 
+ipc.on('set-max-height', function(maxHeight) {
+	$('body').css('max-height', maxHeight);
+	$('#results').css('max-height', maxHeight - 80);
+});
+
 ipc.on('results', function(results) {
 	
 	var resnum = 0;
@@ -197,7 +202,7 @@ ipc.on('results', function(results) {
 					(result.icon ?
 						'<img class="pull-left" width="58" height="58" src="' + result.icon + '"/>' : ''
 					) +
-					'<div class="pull-left" style="margin-left: 5px;overflow:hidden;white-space:nowrap;max-width:620px">' +
+					'<div class="pull-left" style="margin-left: 5px;overflow:hidden;white-space:nowrap;max-width:560px">' +
 						'<h4>' +
 							'<span style="color:black">' +
 								result.label +

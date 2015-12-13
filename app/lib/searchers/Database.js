@@ -5,7 +5,7 @@ var Database = {};
 var Datastore = require('nedb'), db;
 var path = require('path'),
 	fs = require('fs');
-var exploreDirectory = require('../exploreDirectory').exploreDirectory
+var exploreDirectory = require('../exploreDirectory').exploreDirectory;
 
 
 Database.search = function(query, callback)
@@ -17,10 +17,12 @@ Database.search = function(query, callback)
 	}
 	
 	// Remove casing from the query
-	query = query.toLowerCase();
+	rgx = new RegExp(
+		'^' + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), "i"
+	);
 	
 	// Match any of the terms with the full query as a plain string.
-	db.find({compiledterms: query }, function(err, results) {
+	db.find({terms: rgx }, function(err, results) {
 		
 		if (err) {
 			console.error('NeDB error: ' + err);
@@ -168,7 +170,6 @@ Database.insert = function(entry, insertcallback)
 		
 	} while (camelcaseparts.length > 0);
 	
-	entry.compiledterms = SplitTermsIntoIndexes(array_unique(entry.terms));
 	
 	db.insert(entry, function(err, newdoc) {
 		
@@ -207,7 +208,13 @@ function getSearchCallback(moduleID)
 	return function(query, callback) {
 		
 		if (typeof query == 'string') {
-			query = { compiledterms: query };
+			
+			rgx = new RegExp(
+				"^" + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 
+				"i"
+			);
+			
+			query = { terms: rgx };
 		}
 		
 		query.searcherID = moduleID;
@@ -220,7 +227,13 @@ function getDeleteCallback(moduleID)
 	return function(query, callback) {
 		
 		if (typeof query == 'string') {
-			query = { compiledterms: query };
+			
+			rgx = new RegExp(
+				"^" + query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 
+				"i"
+			);
+			
+			query = { terms: rgx };
 		}
 		
 		query.searcherID = moduleID;
@@ -268,8 +281,15 @@ function getLoadSearchModules(app, sdir) {
 			console.error('Unable to read modules: ' + err);
 			return;
 		}
+		var ext;
 		
-		for (var i = 0; i < files.length; i++) {
+		for (var i = 0; i < files.length; i++) 
+		{
+			ext = files[i].substr(files[i].lastIndexOf('.'));
+			if (ext != '.js')
+			{
+				continue;
+			}
 			
 			var moduleName = files[i].substr(0, files[i].lastIndexOf('.'));
 			var fqmn = path.join(sdir, moduleName).replace(path.sep, '.');
@@ -335,8 +355,6 @@ exports.start = function(app)
 			console.log("REMOVED OLD ENTRIES = " + numrows + " err: " + err);
 			
 			db.persistence.setAutocompactionInterval(300000);
-			db.ensureIndex({ fieldName: 'compiledterms'});
-			
 			for (var i = 0; i < searcherDirs.length; i++)
 			{
 				fs.readdir(
