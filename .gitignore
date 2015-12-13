@@ -7,3 +7,6 @@ DEADJOE
 /build/
 /console/
 /cache/
+
+/app/index.html
+/app/lib/results.js
