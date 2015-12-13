@@ -188,18 +188,23 @@ ipc.on('results', function(results) {
 	$('#results').html(
 		$.map(results, function(result) {
 			resnum++;
+			console.log("RESULT:");
+			console.log(result);
 			var resultNode = $('<a class="clearfix"/>')
 				.attr('id', 'result-' + resnum)
 				.addClass('list-group-item')
 				.append(
-					'<img class="pull-left" width="58" height="58" src="' + result.icon + '"/>' +
+					(result.icon ?
+						'<img class="pull-left" width="58" height="58" src="' + result.icon + '"/>' : ''
+					) +
 					'<div class="pull-left" style="margin-left: 5px;overflow:hidden;white-space:nowrap;max-width:620px">' +
 						'<h4>' +
 							'<span style="color:black">' +
 								result.label +
 							'</span>' +
 						'</h4>' +
-						'<div>' + result.path + '</div>' +
+						(result.path ?
+							'<div>' + result.path + '</div>' : '') +
 					'</div>' +
 					'<div class="pull-right">' +
 						(resnum <= 9 ?

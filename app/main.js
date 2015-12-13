@@ -232,10 +232,30 @@ ipc
 		return false;
 	})
 	.on('search', function(event, query) {
-
-		var results = Database.search(query, function(results) {
+		
+		m = query.match(/^((\(|)[\d\.]+((|\()\s*(|\()(|\()(\+|\-|\/|\%|\*)\s*([\d\.]+|)(\)|))*)*$/);
+		if (m)
+		{
+			console.log(m);
+			var calculation = "";
+			try
+			{
+				calculation = eval(m[1]);
+			}
+			catch (err)
+			{
+				console.log(err);
+			}
+			
+			var results = [{label: calculation, command: '', path: m[1], icon: ''}];
 			mainWindow.webContents.send('results', results);
-		});
+		}
+		else 
+		{	
+			var results = Database.search(query, function(results) {
+				mainWindow.webContents.send('results', results);
+			});
+		}
 	});
 
 
