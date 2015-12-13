@@ -193,24 +193,13 @@ ipc.on('results', function(results) {
 	$('#results').html(
 		$.map(results, function(result) {
 			resnum++;
-			var resultNode = $('<a class="clearfix"/>')
-				.attr('id', 'result-' + resnum)
-				.addClass('list-group-item')
-				.append(
-					'<img class="pull-left" width="58" height="58" src="' + result.icon + '"/>' +
-					'<div class="pull-left" style="margin-left: 5px;overflow:hidden;white-space:nowrap;max-width:560px">' +
-						'<h4>' +
-							'<span style="color:black">' +
-								result.label +
-							'</span>' +
-						'</h4>' +
-						'<div>' + result.path + '</div>' +
-					'</div>' +
-					'<div class="pull-right">' +
-						(resnum <= 9 ?
-							'&#8984;' + resnum : '' ) +
-					'</div>'
-				)
+			var resultNode = 
+				$(template_results({
+					number: resnum,
+					icon: result.icon,
+					path: result.path, 
+					label: result.label
+				}))
 				.data('command', result.command)
 				.data('result', result);
 			

@@ -13,6 +13,7 @@
     "grunt-electron-app-builder": "^0.1.0",
     "grunt-exec": "^0.4.6",
     "grunt-install-dependencies": "^0.2.0",
+    "jade": "^1.11.0",
     "when": "^3.6.4"
   }
 }

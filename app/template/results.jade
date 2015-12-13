@@ -1,0 +1,14 @@
+a.clearfix.list-group-item(id="result-" + number)
+	img.pull-left(width="58", height="58", src=icon)
+	.pull-left(style={
+		'margin-left': '5px',
+		overflow: 'hidden',
+		'white-space': 'nowrap',
+		'max-width' : '560px'
+	})
+		h4
+			span(style={color: 'black'})= label
+		div= path
+	.pull-right
+		if number <= 9
+			| &#8984 #{number}

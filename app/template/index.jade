@@ -1,0 +1,35 @@
+doctype html
+html(lang="en")
+	head
+		title= WTF
+		link(href="node_modules/bootstrap/dist/css/bootstrap.min.css", rel="stylesheet", type="text/css")
+		link(href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css", rel="stylesheet", type="text/css")
+	style
+		| html, body { background-color: #71B238; height: 80px; width: 100%; }
+		| .list-group { max-height: 722px; overflow: scroll; background-color:rgba(255,255,255,0.8);}
+		| .list-group-item { background-color:rgba(255,255,255,0.0);}
+		| 
+		| #query {
+		|   height: 70px;
+		|   font-size: 42px;
+		|   background-color: #A6CB45;
+		| }
+		| 
+		| #query .active {
+		|   background-color: #A6CB45;
+		| }
+		| 
+		| #results {
+		|   overflow-y: auto;
+		|   overflow-x: hidden;
+		| }
+	body(autosize="on")
+		div.col-md-12(style="padding: 5px")
+			div.input-group.input-group-lg
+				input#query.form-control(type="text")
+				span.input-group-addon
+					img(src="media/img/Minecraft_Creeper_2-48x48.png")
+			ul#results.list-group(style={padding: 0, margin: 0})
+	script(src="node_modules/jade/runtime.js")
+	script(src="lib/results.js")
+	script(src="lib/browser.js")
