@@ -271,29 +271,9 @@ ipc
 	})
 	.on('search', function(event, query) {
 		
-		m = query.match(/^((\(|)[\d\.]+((|\()\s*(|\()(|\()(\+|\-|\/|\%|\*|\()\s*([\d\.]+|)(\)|))*)*\s*$/);
-		if (m)
-		{
-			console.log(m);
-			var calculation = "";
-			try
-			{
-				calculation = eval(m[0]);
-			}
-			catch (err)
-			{
-				console.log(err);
-			}
-			
-			var results = [{label: calculation, command: '', path: m[0], icon: ''}];
+		var results = Database.search(query, function(results) {
 			mainWindow.webContents.send('results', results);
-		}
-		else 
-		{	
-			var results = Database.search(query, function(results) {
-				mainWindow.webContents.send('results', results);
-			});
-		}
+		});
 	});
 
 

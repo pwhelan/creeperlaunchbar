@@ -4,7 +4,9 @@
 var Database = {};
 var Datastore = require('nedb'), db;
 var path = require('path'),
-	fs = require('fs');
+	fs = require('fs'),
+	Q = require('q');
+
 var exploreDirectory = require('../exploreDirectory').exploreDirectory;
 
 
@@ -25,6 +27,7 @@ Database.search = function(query, callback)
 	db.find({terms: rgx }, function(err, results) {
 		
 		if (err) {
+			callback();
 			console.error('NeDB error: ' + err);
 			return;
 		}
@@ -301,6 +304,20 @@ function getLoadSearchModules(app, sdir) {
 			
 			
 			switch (searcher.apiversion) {
+			case "0.0.4":
+				searcher.initialize({
+					register: function(callback)
+					{
+						console.log("REGISTER SEARCH...");
+						Database.searches.push(callback);
+					},
+					explore:getExploreCallback(fqmn),
+					insert:	getInsertCallback(fqmn, true),
+					find:	getSearchCallback(fqmn),
+					app:	app
+				});
+				break;
+				
 			case "0.0.3":
 				searcher.initialize({
 					explore:getExploreCallback(fqmn),
@@ -330,7 +347,52 @@ function getLoadSearchModules(app, sdir) {
 	};
 }
 
-exports.search = Database.search;
+
+Database.searches = [Database.search];
+
+
+exports.search = function(query, callback)
+{
+	var qs = [];
+	var d = null;
+	
+	
+	for (var s = 0; s < Database.searches.length; s++)
+	{
+		(function(qs, d, m) {
+			
+			qs.push(d.promise);
+			Database.searches[s](query, function(results) {
+				d.resolve(results);
+			});
+			
+		}(qs, Q.defer(), s));
+		
+	}
+	
+	
+	Q.allSettled(qs).then(function(results) {
+		
+		var res = [];
+		
+		
+		for (var i = 0; i < results.length; i++)
+		{
+			if (!results[i].value)
+			{
+				continue;
+			}
+			
+			for (var r = 0; r < results[i].value.length; r++)
+			{
+				res.push(results[i].value[r]);
+			}
+		}
+		
+		callback(res);
+	});
+};
+
 exports.load = function(dir)
 {
 	fs.readdir(dir, getLoadSearchModules(dir));
