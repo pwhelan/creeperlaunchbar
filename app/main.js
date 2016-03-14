@@ -161,25 +161,8 @@ app.on('ready', function() {
 	}
 	
 	
-	var screen = require('screen');
-	var display = screen.getPrimaryDisplay();
-	var displays = screen.getAllDisplays();
-	var width = Math.round(display.bounds.width*0.60);
-	width = width - (width % 100);
-	console.log("WIDTH = " + width);
-	var cursor = screen.getCursorScreenPoint();
-	
-	for (var i = 0, curx = 0; i < displays.length; i++)
-	{
-		if (cursor.x < (curx + displays[i].bounds.width))
-		{
-			break;
-		}
-		curx += displays[i].bounds.width;
-	}
-	
 	mainWindow = new BrowserWindow({
-		'width':  width,
+		'width':  500,
 		'height': 84,
 		'frame': false,
 		'always-on-top': true,
@@ -189,14 +172,12 @@ app.on('ready', function() {
 		'type': 'panel'
 	});
 	
-	console.log({
-		boundswidth: displays[i].bounds.width,
-		width: width,
-		curx: curx
-	});
+	//console.log({
+	//	boundswidth: displays[i].bounds.width,
+	//	width: width,
+	//	curx: curx
+	//});
 	
-	/** MULTI MONITOR SUPPORT !!! */
-	mainWindow.setPosition(curx+((displays[i].bounds.width-width)/2), 100);
 	
 	// and load the index.html of the app.
 	mainWindow.loadUrl('file://' + __dirname + '/index.html');
@@ -218,36 +199,29 @@ app.on('ready', function() {
 		app.dock.hide();
 	}
 	
-	mainWindow.webContents.send(
-		'set-max-height',
-		display.size.height - 84 * 2
-	);
+	// Library for finding display offset+width
+	var Offset = require('./lib/display-offset');
+	
 	
 	var ret = GlobalShortcut.register('ctrl+space', function() {
 		
-		var cursor = screen.getCursorScreenPoint();
-		for (var i = 0, curx = 0; i < displays.length; i++)
-		{
-			if (cursor.x < (curx + displays[i].bounds.width))
-			{
-				break;
-			}
-			curx += displays[i].bounds.width;
-		}
-		mainWindow.setPosition(curx+((displays[i].bounds.width-width)/2), 100);
+		var offset = Offset();
+		var osize = mainWindow.getSize();
 		
-		mainWindow.webContents.send(
-			'set-max-height',
-			display.size.height - 84 * 2
-		);
+		
+		console.log(offset);
+		
+		mainWindow.setPosition(offset.x, offset.y);
+		mainWindow.webContents.send('set-max-height', offset.h);
+		
+		mainWindow.setSize(offset.w, 84);
 		
 		mainWindow.show();
 		mainWindow.focus();
 		
-		var osize = mainWindow.getSize();
-		console.log("RESET SIZE");
-		mainWindow.setSize(osize[0], 84);
-		
+		setTimeout(function() { 
+			mainWindow.setSize(offset.w, 84);
+		}, 250);
 		
 		mainWindow.webContents.send('show-browser');
 	});
