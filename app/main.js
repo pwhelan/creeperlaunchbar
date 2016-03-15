@@ -216,14 +216,14 @@ app.on('ready', function() {
 		
 		mainWindow.setSize(offset.w, 84);
 		
+		mainWindow.webContents.send('show-browser');
+		
 		mainWindow.show();
 		mainWindow.focus();
 		
 		setTimeout(function() { 
 			mainWindow.setSize(offset.w, 84);
 		}, 250);
-		
-		mainWindow.webContents.send('show-browser');
 	});
 	
 });

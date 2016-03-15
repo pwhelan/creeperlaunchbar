@@ -176,7 +176,7 @@ $('body').on('keyup', function(ev) {
 ipc.on('show-browser', function() {
 	$('#results').hide();
 	ipc.send('resize', $('body').height());
-	$('#query').focus();
+	$('#query').focus().val('');
 });
 
 ipc.on('set-max-height', function(maxHeight) {
