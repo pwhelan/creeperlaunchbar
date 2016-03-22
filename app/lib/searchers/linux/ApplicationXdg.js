@@ -301,7 +301,8 @@ var ParseApplicationsDirectory = function(filepath, Database)
 	{
 		ParseDesktopEntry(filepath, Database);
 	}
-	else {
+	else
+	{
 		fs.lstat(filepath, function(err, stat) {
 			
 			if (err) {
@@ -318,7 +319,8 @@ var ParseApplicationsDirectory = function(filepath, Database)
 							var fpath = path.normalize(filepath + '/' + file);
 							
 							
-							if (!exists) {
+							if (!exists)
+							{
 								if (fpath in XDG.entries) {
 									console.log("REMOVING!");
 									XDG.entries[fpath].remove();
@@ -329,7 +331,8 @@ var ParseApplicationsDirectory = function(filepath, Database)
 									console.log(XDG.entries);
 								}
 							}
-							else {
+							else 
+							{
 								ParseApplicationsDirectory(fpath, Database);
 							}
 						});
