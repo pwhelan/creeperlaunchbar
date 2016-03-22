@@ -176,8 +176,18 @@ Database.insert = function(entry, insertcallback)
 	
 	db.insert(entry, function(err, newdoc) {
 		
-		if (err) {
-			console.error('NeDB Insert Error: ' + err);
+		if (err) 
+		{
+			if (err.errorType == 'uniqueViolated')
+			{
+				db.update({_id: entry._id}, entry, {}, function(err, numReplaced) {
+					
+				});
+			}
+			else
+			{
+				console.error('NeDB Insert Error: ' + err.message);
+			}
 			return;
 		}
 		
@@ -411,6 +421,8 @@ exports.start = function(app)
 	
 	db = new Datastore({ filename: dbFile });
 	db.loadDatabase(function(err) {
+		
+		db.ensureIndex({fieldName: 'filename', unique: true});
 		
 		db.remove({persistent: false}, {multi: true}, function(err, numrows) {
 			
