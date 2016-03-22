@@ -177,7 +177,7 @@ var ParseDesktopEntry = function(fpath, Database)
 						var ext = entry.Icon.substr(entry.Icon.lastIndexOf('.'));
 						if (ext != 'jpg' && ext != 'png')
 						{
-							iconPath = Database.app.getDataPath() + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
+							iconPath = Database.app.getPath('userData') + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
 							console.log("CONVERT " + entry.Icon + " -> " + iconPath);
 							var convert = spawn('convert', ['-flatten', '-alpha', 'on', '-background', 'none', entry.Icon, iconPath]);
 							
@@ -247,7 +247,7 @@ var ParseDesktopEntry = function(fpath, Database)
 							{
 								if (format.convert)
 								{
-									var iconPath = Database.app.getDataPath() + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
+									var iconPath = Database.app.getPath('userData') + '/cache/app-icons/' + checksum(entry.Icon) + '.png';
 									console.log("CONVERT " + entry.Icon + " -> " + iconPath);
 									var convert = spawn('convert', ['/usr/share/pixmaps/' + entry.Icon, iconPath]);
 									

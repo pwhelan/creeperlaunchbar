@@ -1,6 +1,6 @@
 var app = require('app'),
 	// IPC between Main envinronment and Chromium
-	ipc = require('ipc'),
+	ipc = require('electron').ipcMain,
 	// File System Access
 	fs = require('fs'),
 	// Path Manipulation
@@ -139,9 +139,9 @@ switch(process.platform)
 // Register a 'ctrl+x' shortcut listener.
 app.on('ready', function() {
 	
-	if (!fs.existsSync(app.getDataPath()))
+	if (!fs.existsSync(app.getPath('userData')))
 	{
-		fs.mkdirSync(app.getDataPath());	
+		fs.mkdirSync(app.getPath('userData'));
 	}
 	
 	Database.start(app);
@@ -164,12 +164,18 @@ app.on('ready', function() {
 	mainWindow = new BrowserWindow({
 		'width':  500,
 		'height': 84,
+		'transparent': true,
 		'frame': false,
-		'always-on-top': true,
+		'alwaysOnTop': true,
 		'show': false,
 		'skip-taskbar': true,
 		'auto-hide-menu-bar': true,
-		'type': 'panel'
+		//'type': 'panel',
+		'backgroundColor': '#00000000',
+		'closable': false,
+		'resizable': false,
+		'movable': false,
+		'useContentSize': false
 	});
 	
 	//console.log({
@@ -180,15 +186,16 @@ app.on('ready', function() {
 	
 	
 	// and load the index.html of the app.
-	mainWindow.loadUrl('file://' + __dirname + '/index.html');
+	mainWindow.loadURL('file://' + __dirname + '/index.html');
 	
 	// Emitted when the window is closed.
 	mainWindow
 		.on('closed', function() {
+			//mainWindow.webContents.send('hide-browser');
 			// Dereference the window object, usually you would store windows
 			// in an array if your app supports multi windows, this is the time
 			// when you should delete the corresponding element.
-			mainWindow = null;
+			//mainWindow = null;
 		});
 	mainWindow
 		.on('blur', function() {

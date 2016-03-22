@@ -21,7 +21,7 @@ function checksum (str, algorithm, encoding) {
 var ParseApplicationBundle = function(fpath, Database)
 {
 	console.log("PARSE = " + fpath + " APP = " + Database.app);
-	console.log(" APP PATH = " + Database.app.getDataPath());
+	console.log(" APP PATH = " + Database.app.getPath('userData'));
 	
 	var info;
 	
@@ -42,14 +42,14 @@ var ParseApplicationBundle = function(fpath, Database)
 		};
 	}
 	
-	if (!fs.existsSync(Database.app.getDataPath() + '/cache'))
+	if (!fs.existsSync(Database.app.getPath('userData') + '/cache'))
 	{
-		fs.mkdirSync(Database.app.getDataPath() + '/cache');
+		fs.mkdirSync(Database.app.getPath('userData') + '/cache');
 	}
 	
-	if (!fs.existsSync(Database.app.getDataPath() + '/cache/app-icons'))
+	if (!fs.existsSync(Database.app.getPath('userData') + '/cache/app-icons'))
 	{
-		fs.mkdirSync(Database.app.getDataPath() + '/cache/app-icons');
+		fs.mkdirSync(Database.app.getPath('userData') + '/cache/app-icons');
 	}
 	
 	// Support for Bundled Chrome Apps
@@ -68,7 +68,7 @@ var ParseApplicationBundle = function(fpath, Database)
 	}
 	
 	var appName = info.CFBundleName? info.CFBundleName : info.CFBundleExecutable;
-	var pngIconFile = Database.app.getDataPath() + '/cache/app-icons/' +
+	var pngIconFile = Database.app.getPath('userData') + '/cache/app-icons/' +
 		checksum(fpath + '/' + appName) + '.png';
 	
 	

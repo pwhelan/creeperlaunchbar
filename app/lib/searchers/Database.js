@@ -400,7 +400,7 @@ exports.load = function(dir)
 
 exports.start = function(app)
 {
-	var dbFile = app.getDataPath() + '/database.nedb';
+	var dbFile = app.getPath('userData') + '/database.nedb';
 	
 	var platform = ( process.platform == 'darwin' ? 'osx' : process.platform );
 	var searcherDirs = [
