@@ -5,12 +5,17 @@ html(lang="en")
 		link(href="node_modules/bootstrap/dist/css/bootstrap.min.css", rel="stylesheet", type="text/css")
 		link(href="node_modules/bootstrap/dist/css/bootstrap-theme.min.css", rel="stylesheet", type="text/css")
 	style
-		| html, body { background-color: #71B238; height: 80px; width: 100%; }
+		| html, body { background-color: transparent; height: 80px; width: 100%;}
 		| .list-group { max-height: 722px; overflow: scroll; background-color:rgba(255,255,255,0.8);}
 		| .list-group-item { background-color:rgba(255,255,255,0.0);}
 		| 
+		| html {
+		|   border-radius: 5px;
+		| }
+		| 
 		| body {
 		|   overflow: hidden;
+		|   border-radius: 5px;
 		| }
 		| 
 		| #query {
@@ -23,12 +28,17 @@ html(lang="en")
 		|   background-color: #A6CB45;
 		| }
 		| 
+		| #wrapper {
+		|   background-color: #A6CB45;
+		|   border-radius: 5px;
+		| }
+		| 
 		| #results {
 		|   overflow-y: auto;
 		|   overflow-x: hidden;
 		| }
 	body(autosize="on")
-		div.col-md-12(style="padding: 5px")
+		div#wrapper.col-md-12(style="padding: 5px")
 			div.input-group.input-group-lg
 				input#query.form-control(type="text")
 				span.input-group-addon
