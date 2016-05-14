@@ -1,4 +1,4 @@
-var screen = require('screen'),
+var screen = require('electron').screen,
 	util = require('util');
 
 module.exports = function()

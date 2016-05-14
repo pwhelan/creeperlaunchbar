@@ -1,4 +1,5 @@
-var app = require('app'),
+var electron = require('electron'),
+	app = electron.app,
 	// IPC between Main envinronment and Chromium
 	ipc = require('electron').ipcMain,
 	// File System Access
@@ -8,14 +9,17 @@ var app = require('app'),
 	// Process Spawning
 	spawn = require('child_process').spawn,
 	// Module to create native browser window.
-	BrowserWindow = require('browser-window'),
+	BrowserWindow = electron.BrowserWindow,
 	// Module to Activate the Global Shortcut
-	GlobalShortcut = require('global-shortcut'),
+	GlobalShortcut = electron.globalShortcut,
 	// Database for Search Results
 	Database = require('./lib/searchers/Database');
 
-var Menu = require('menu');
-var Tray = require('tray');
+app.commandLine.appendSwitch('remote-debugging-port', '8315');
+app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1');
+
+var Menu = electron.Menu;
+var Tray = electron.Tray;
 
 var appIcon = null;
 	
@@ -136,7 +140,7 @@ switch(process.platform)
 		break;
 }
 
-// Register a 'ctrl+x' shortcut listener.
+
 app.on('ready', function() {
 	
 	if (!fs.existsSync(app.getPath('userData')))
@@ -210,8 +214,10 @@ app.on('ready', function() {
 	var Offset = require('./lib/display-offset');
 	
 	
-	var ret = GlobalShortcut.register('ctrl+space', function() {
-		
+	console.log('ready...');
+	
+	var ret = GlobalShortcut.register('Control+Space', function() {
+		console.log("poof");
 		var offset = Offset();
 		var osize = mainWindow.getSize();
 		

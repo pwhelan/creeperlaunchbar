@@ -6,7 +6,7 @@ var exploreDirectory = require('../../exploreDirectory').exploreDirectory,
 	plist = require('plist'),
 	fs = require('fs'),
 	path = require('path'),
-	ipc = require('ipc'),
+	ipc = require('electron').ipcMain,
 	crypto = require('crypto');
 var spawn = require('child_process').spawn;
 
