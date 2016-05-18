@@ -4,7 +4,7 @@
  */
 var fs = require('fs'),
 	path = require('path'),
-	ipc = require('ipc'),
+	ipc = require('electron').ipcMain,
 	crypto = require('crypto');
 	spawn = require('child_process').spawn,
 	_ = require('underscore');
