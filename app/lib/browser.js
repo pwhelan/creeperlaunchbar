@@ -189,7 +189,7 @@ ipc.on('set-max-height', function(maxHeight) {
 	$('#results').css('max-height', maxHeight - 80);
 });
 
-ipc.on('results', function(results) {
+ipc.on('results', function(event, results) {
 	
 	var resnum = 0;
 	var active = $('#results .active').data('result');
