@@ -12,7 +12,6 @@ _ = require 'underscore'
 
 class Database
 	constructor: () ->
-		console.log "NEW DATABASE!"
 		searcherDirs = [
 			'all'
 			if process.platform == 'darwin' then 'osx' else process.platform
