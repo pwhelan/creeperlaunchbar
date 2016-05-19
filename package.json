@@ -4,6 +4,7 @@
   "description": "Launch Bar made with Electron",
   "main": "app/main.js",
   "dependencies": {
+    "coffee": "^3.2.1",
     "grunt": "^0.4.5",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-compress": "^0.12.0",
