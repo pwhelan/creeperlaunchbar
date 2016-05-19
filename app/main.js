@@ -148,9 +148,6 @@ app.on('ready', function() {
 		fs.mkdirSync(app.getPath('userData'));
 	}
 	
-	Database.start(app);
-	
-	
 	try
 	{
 		appIcon = new Tray(__dirname + '/media/img/Minecraft_Creeper_2-16x16.png');
