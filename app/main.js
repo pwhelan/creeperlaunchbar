@@ -223,17 +223,8 @@ app.on('ready', function() {
 		
 		mainWindow.setPosition(offset.x, offset.y);
 		mainWindow.webContents.send('set-max-height', offset.h);
-		
-		mainWindow.setSize(offset.w, 84);
-		
 		mainWindow.webContents.send('show-browser');
-		
-		mainWindow.show();
-		mainWindow.focus();
-		
-		setTimeout(function() { 
-			mainWindow.setSize(offset.w, 84);
-		}, 250);
+		mainWindow.setSize(offset.w, 84);
 	});
 	
 });
