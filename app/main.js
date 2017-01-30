@@ -164,7 +164,7 @@ app.on('ready', function() {
 	
 	mainWindow = new BrowserWindow({
 		'width':  500,
-		'height': 84,
+		'height': 80,
 		'transparent': true,
 		'frame': false,
 		'alwaysOnTop': true,
@@ -224,7 +224,7 @@ app.on('ready', function() {
 		mainWindow.setPosition(offset.x, offset.y);
 		mainWindow.webContents.send('set-max-height', offset.h);
 		mainWindow.webContents.send('show-browser');
-		mainWindow.setSize(offset.w, 84);
+		mainWindow.setSize(offset.w, 80);
 	});
 	
 });
@@ -239,7 +239,7 @@ ipc
 		
 		var osize = mainWindow.getSize();
 		console.log("RESET SIZE CLOSE");
-		mainWindow.setSize(osize[0], 84);
+		mainWindow.setSize(osize[0], 80);
 		mainWindow.hide();
 		
 		return false;
