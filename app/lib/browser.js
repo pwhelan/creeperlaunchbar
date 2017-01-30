@@ -229,20 +229,18 @@ ipc.on('results', function(event, results) {
 	$('body').height(80 + $('#results').height());
 	$('#results li:first').addClass('active');
 	
-	setTimeout(function() {
-		$('#results').show(function() {
-			
-			ipc.send('resize', $('body').height());
-			active = $('#results .active.list-group-item');
-			
-			if (active.length > 0)
-			{
-				setTimeout(function() {
-					ScrollToNode($('#results'), active);
-				}, 100);
-			}
-		});
-	}, 50);
+	$('#results').show(function() {
+		
+		ipc.send('resize', $('body').height());
+		active = $('#results .active.list-group-item');
+		
+		if (active.length > 0)
+		{
+			//setTimeout(function() {
+				ScrollToNode($('#results'), active);
+			//}, 100);
+		}
+	});
 });
 
 $('#results').on('click', '.list-group-item', function(ev) {
