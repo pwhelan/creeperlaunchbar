@@ -214,46 +214,44 @@ app.on('ready', function() {
 	console.log('ready...');
 	
 	var ret = GlobalShortcut.register('Control+Space', function() {
-		console.log("poof");
 		var offset = Offset();
-		var osize = mainWindow.getSize();
-		
-		
-		console.log(offset);
-		
-		mainWindow.setPosition(offset.x, offset.y);
 		mainWindow.webContents.send('set-max-height', offset.h);
 		mainWindow.webContents.send('show-browser');
-		mainWindow.setSize(offset.w, 80);
 	});
+	if (!ret)
+	{
+		console.log("unable to register global shortcut");
+		exit(0);
+	}
 	
-});
-
-
-ipc
-	.on('resize', function(event, size) {
-		var osize = mainWindow.getSize();
-		mainWindow.setSize(osize[0], size);
-	})
-	.on('hide-window', function(event, args) {
-		
-		var osize = mainWindow.getSize();
-		console.log("RESET SIZE CLOSE");
-		mainWindow.setSize(osize[0], 80);
-		mainWindow.hide();
-		
-		return false;
-	})
-	.on('search', function(event, query) {
-		var results = Database.search(query, function(results) {
-			mainWindow.webContents.send('results', results);
+	ipc
+		.on('resize', function(event, size) {
+			var offset = Offset();
+			mainWindow.setSize(offset.w, size);
+		})
+		.on('hide-window', function(event, args) {
+			
+			var osize = mainWindow.getSize();
+			mainWindow.setSize(osize[0], 80);
+			mainWindow.hide();
+			
+			return false;
+		})
+		.on('search', function(event, query) {
+			var results = Database.search(query, function(results) {
+				mainWindow.webContents.send('results', results);
+			});
+		})
+		.on('show', function() {
+			var offset = Offset();
+			
+			mainWindow.show();
+			mainWindow.focus();
+			
+			mainWindow.setPosition(offset.x, offset.y);
+			mainWindow.setSize(offset.w, 80);
 		});
-	})
-	.on('show', function() {
-		mainWindow.show();
-		mainWindow.focus();
-	});
-
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
