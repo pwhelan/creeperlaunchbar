@@ -6,6 +6,7 @@ path = require 'path'
 ipc = require('electron').ipcMain
 crypto = require 'crypto'
 spawn = require('child_process').spawn
+execFile = require('child_process').execFile
 _ = require 'underscore'
 desktopEntry = require 'node-x11-desktop-entry';
 
@@ -69,13 +70,46 @@ class ApplicationXdg
 				execPath = _.filter appPath, (path) ->
 					return path[0] != '%';
 				
+				###
 				spawn '/bin/bash', [
 					'-c'
 					execPath.join(' ')
 				], {
-					detached: false
-					cwd: process.env.HOME
+					detached:	false
+					cwd:		process.env.HOME
+					env:		process.env
 				}
+				###
+				
+				if execPath[0][0] == '"' # and execPath[0][-1] == '"'
+					execPath[0] = execPath[0][1..-2]
+				
+				console.log "EXEC PATH #{execPath[0]}"
+				
+				if execPath[0][0] != '/'
+					console.log "FINDING PATH"
+					for epath in process.env.PATH.split ':'
+						if fs.existsSync epath + '/' + execPath[0]
+							console.log "FOUND #{execPath[0]} in #{epath}"
+							execPath[0] = epath + '/' + execPath[0]
+							break
+				
+				console.log "EXECFILE:"
+				console.log execPath
+				
+				###
+				execFile execPath[0], execPath[1..], {
+					detached:	true
+					cwd:		process.env.HOME
+					env:		process.env
+				}
+				###
+				spawn execPath[0], execPath[1..], {
+					detached:	false
+					cwd:		process.env.HOME
+					env:		process.env
+				}
+				
 			catch msg
 				console.error("ERROR: " +msg);
 	
