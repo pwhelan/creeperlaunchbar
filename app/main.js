@@ -254,10 +254,13 @@ ipc
 		return false;
 	})
 	.on('search', function(event, query) {
-		
 		var results = Database.search(query, function(results) {
 			mainWindow.webContents.send('results', results);
 		});
+	})
+	.on('show', function() {
+		mainWindow.show();
+		mainWindow.focus();
 	});
 
 

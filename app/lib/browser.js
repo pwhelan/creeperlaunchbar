@@ -177,6 +177,7 @@ ipc.on('show-browser', function() {
 	$('#results').hide();
 	ipc.send('resize', $('body').height());
 	$('#query').focus().val('');
+	ipc.send('show');
 });
 
 ipc.on('hide-browser', function() {
