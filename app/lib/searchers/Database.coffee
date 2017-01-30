@@ -100,7 +100,7 @@ class Database
 		
 		entry.terms = [entry.label.toLowerCase()]
 		
-		if filename in entry then entry.terms.push \
+		if 'filename' of entry then entry.terms.push \
 			(path.basename entry.filename).substr 0, \
 				(path.basename entry.filename).lastIndexOf('.')
 		
